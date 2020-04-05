@@ -1,0 +1,122 @@
+<?php
+
+include_once("../clases/tesoreria.class.php");// se debe incluir la clase del modulo 
+include_once("../../../constructores/paginas_constructor.php");// siempre debera de ir ya que utilizara html que esta en el constructor
+
+if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente a vacio 
+    
+    $css =  new PageConstruct("", "", 1, "", 1, 0);// se instancia para poder utilizar el html
+    $obCon = new Tesoreria(1);// se instancia para poder conectarse con la base de datos 
+    
+    switch($_REQUEST["Accion"]) {
+       
+        case 1://Listar las categorias
+            $sql="SELECT * FROM catalogo_categorias WHERE Estado=1 ORDER BY Orden ASC";
+            $Consulta=$obCon->Query($sql);
+            while($DatosCategorias=$obCon->FetchAssoc($Consulta)){
+                $idItem=$DatosCategorias["ID"];
+                $js="onclick=ListarLocales(`$idItem`)";
+                $css->divCard(utf8_encode($DatosCategorias["Nombre"]), utf8_encode($DatosCategorias["Descripcion"]), "", $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
+
+            }
+        break;//Fin caso 1    
+        case 2://dibuja el listado de los locales
+            $idCategoria=$obCon->normalizar($_REQUEST["Categoria"]);
+            $sql="SELECT * FROM locales WHERE idCategoria='$idCategoria' AND Estado=1 ORDER BY Orden ASC";
+            $Consulta=$obCon->Query($sql);
+            while($DatosCategorias=$obCon->FetchAssoc($Consulta)){
+                $idItem=$DatosCategorias["ID"];
+                $js="onclick=DibujaLocal(`$idItem`)";
+                $Fondo="../../images/image.webp";
+                $DatosFondo=$obCon->DevuelveValores("locales_imagenes", "idLocal", $idItem);
+                if($DatosFondo["ID"]<>''){
+                    $Fondo=$DatosFondo["Ruta"];
+                }
+                $css->divCardLocales($Fondo,utf8_encode($DatosCategorias["Nombre"]), utf8_encode($DatosCategorias["Descripcion"]), utf8_encode($DatosCategorias["Telefono"]."<br>".$DatosCategorias["Direccion"]), $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
+
+            }
+            
+        break;//fin caso 2
+        
+        case 3://dibuja la informacion general del local
+            
+            $idLocal=$obCon->normalizar($_REQUEST["idLocal"]);
+            $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
+            $js="onclick=DibujaLocal(`$idLocal`)";
+            $Fondo="../../images/image.webp";
+            $DatosFondo=$obCon->DevuelveValores("locales_imagenes", "idLocal", $idLocal);
+            if($DatosFondo["ID"]<>''){
+                $Fondo=$DatosFondo["Ruta"];
+            }
+            $dbLocal=$DatosLocal["db"];
+            $sql="SELECT * FROM inventarios_clasificacion WHERE Estado=1";
+            $Consulta=$obCon->Query2($sql, HOST, USER, PW, $dbLocal, "");
+            $i=1;
+            $values["values"][0]="";       $values["text"][0]="";  $values["sel"][0]=1;  
+            while ($DatosConsulta = $obCon->FetchAssoc($Consulta)) {                
+                $values["values"][$i]=$DatosConsulta["ID"];       $values["text"][$i]=$DatosConsulta["Clasificacion"];
+                $i=$i+1;
+            }
+            $css->divCardLocales($Fondo,utf8_encode($DatosLocal["Nombre"]), utf8_encode($DatosLocal["Descripcion"]), utf8_encode($DatosLocal["Telefono"]."<br>".$DatosLocal["Direccion"]), $DatosLocal["Icono"], $DatosLocal["ColorIcono"],$js,"style=cursor:pointer",12);       
+            
+            $style="style='width:130%;'";
+             
+            $htmlSelect=$css->getHtmlSelect("cmbClasificacion", "cmbClasificacion", $values, "Clasificacion", $js, $style);
+            $Title="Clasificacion";
+            $css->divForm($Title, $htmlSelect);
+            
+            
+            
+            $html=$css->getHtmlInput("text","BusquedaProducto", "BusquedaProducto", "", "Buscar",'',$style,"search",1);
+            $css->divForm("Busqueda", $html, "", "", 6);
+            print('<div id="DivProductos" class="mdc-layout-grid__cell--span-12">');
+            //$css->divCol("DivProductos", "DivProductos", 12, "", "");
+            
+            $css->Cdiv();
+        break;//fin caso 3
+        
+        case 4://lista los productos
+            $idLocal=$obCon->normalizar($_REQUEST["idLocal"]);
+            if($idLocal==''){
+                exit("No se recibió un local");
+            }
+            $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
+            $idClientUser=$obCon->normalizar($_REQUEST["idClientUser"]);
+            print('<div class="page-wrapper mdc-toolbar-fixed-adjust">');
+                print('<div class="content-wrapper">');
+                    print('<div class="mdc-layout-grid">');                        
+                        print('<div class="mdc-layout-grid__inner">');
+                            $col=4;
+                            
+                            $dbLocal=$DatosLocal["db"];
+                            $sql="SELECT t1.*,
+                                    (SELECT t2.Ruta FROM productos_servicios_imagenes t2 WHERE t1.ID=t2.idProducto ORDER BY t1.ID ASC LIMIT 1) as RutaImagen 
+                                    FROM productos_servicios t1 WHERE t1.Estado=1";
+                            $Consulta=$obCon->Query2($sql, HOST, USER, PW, $dbLocal, "");
+                            while($DatosProductos=$obCon->FetchAssoc($Consulta)){
+                                $html=$css->getHtmlInfoProducto($idClientUser, $idLocal, $DatosProductos["ID"], $DatosProductos["Nombre"], $DatosProductos["DescripcionCorta"], $DatosProductos["RutaImagen"], $DatosProductos["PrecioVenta"]);
+                                $css->divForm($DatosProductos["Nombre"], $html, "", "style=width:100%", $col);
+                            }
+                            
+                            
+                            
+                        $css->Cdiv();
+                            
+
+                        
+                    $css->Cdiv();
+                $css->Cdiv();
+            $css->Cdiv();
+           
+           
+           
+           
+        break;//fin caso 4    
+        
+ }
+    
+          
+}else{
+    print("No se enviaron parametros");
+}
+?>
