@@ -5,7 +5,7 @@
  *  
  */
 
-$myPage="portada.php";  // identifica la pagina para poder controlar el acceso
+$myPage="main.php";  // identifica la pagina para poder controlar el acceso
 $myTitulo="Domi Buga";  //Titulo en la pestaña del navegador
 //include_once("../../sesiones/php_control_usuarios.php"); //Controla los permisos de los usuarios
 include_once("../../modelo/php_conexion.php"); //clase que permite la conexion con la base de datos
@@ -15,8 +15,14 @@ $css =  new PageConstruct($myTitulo); //instancia para el objeto con las funcion
 
 $obCon = new conexion(1); //instancia para Conexion a la base de datos
 
+$css->ShoppingCar("onclick=VerCarrito();");
+
+$css->modal("modalMain", "DOMI", "DivModal");
+
+    print('<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalMain">
+        Open modal
+      </button>');
 $css->PageInit($myTitulo);
-    
     
 $css->PageEnd();
 

@@ -348,5 +348,10 @@ class conexion extends db_conexion{
         return $texto;
         
     }
+    
+    public function getUniqId($prefijo='') {
+        return (str_replace(".","",uniqid($prefijo, true)));
+    }
+     
 }
 ?>

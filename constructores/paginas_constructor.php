@@ -40,6 +40,7 @@ class PageConstruct extends html_estruct_class{
                         <!-- End plugin css for this page -->
                         <!-- Layout styles -->
                         <link rel="stylesheet" href="../../assets/css/demo/style.css">
+                        <link rel="stylesheet" href="../../assets/css/techno/carrito.css">
                         <!-- End layout styles -->
                         <link rel="shortcut icon" href="../../assets/images/favicon.png" />');
             $this->Chead();
@@ -394,26 +395,69 @@ class PageConstruct extends html_estruct_class{
         $html.='</div>';
         $html.='</br>';
         $html.='<div class="col-md-12">';
+            $html.='<input id="PrecioVenta_'.$idProducto.'" type="hidden" value='.$PrecioVenta.'>';
             $html.="<strong>Precio:</strong><h3 style='color:#0b00b9'>$". number_format($PrecioVenta)."</h3>";
         $html.='</div><hr>';
 
         $html.='<div class="col-md-12" style="text-align: justify;">';
-            $html.=utf8_encode($Descripcion);
+            $html.=($Descripcion);
         $html.='</div>';
 
         $html.='</br>';
         $html.='<div class="col-md-12">';
             $style="style='width:130%;height:30px;'";
-            $html.=$this->getHtmlInput("textarea","Observaciones", "Observaciones", "", "Observaciones",'',$style,"",1);
+            $html.=$this->getHtmlInput("textarea","Observaciones_".$idProducto, "Observaciones", "", "Observaciones",'',$style,"",1);
         $html.='</div>';
         $html.='</br>';
         $html.='<div class="col-md-12">';    
         $ancho="width:130%;";
-        $html.=$this->getHtmlBoton(1, "btnAgregar", "btnAgregar", "Agregar al Carrito", "onclick=AgregarAlCarrito(`$idClientUser`,`$idLocal`,`$idProducto`)", $ancho);
+        $html.=$this->getHtmlBoton(1, "btnCarAdd_".$idProducto, "btnAgregar", "Agregar al Carrito", "onclick=AgregarAlCarrito(`$idClientUser`,`$idLocal`,`$idProducto`)", $ancho);
         $html.='</div>';
         
         return($html);
         
+    }
+    
+    public function ShoppingCar($js,$id="aShoppingCAr",$idSp="spItemsCar",$Color="#d91d1d") {
+        print('<a id="'.$id.'" class="cart-icon mdi mdi-cart" '.$js.' style="color:'.$Color.';">        
+            <span class="cart-icon-sp" id="'.$idSp.'">0</span>        
+        </a>');
+    }
+    
+    public function modal($id,$Titulo,$idDivContent,$Tipo=2) {
+        $ClassLarge="";
+        if($Tipo==1){
+            $ClassLarge="modal-sm";
+        }
+        if($Tipo==2){
+            $ClassLarge="modal-lg";
+        }
+        if($Tipo==3){
+            $ClassLarge="modal-xl";
+        }
+        print('<div class="modal fade" id="'.$id.'">
+                    <div class="modal-dialog modal-dialog-scrollable '.$ClassLarge.'">
+                      <div class="modal-content">
+
+                        <!-- Modal Header -->
+                        <div class="modal-header">
+                          <h1 class="modal-title">'.$Titulo.'</h1>
+                          <button type="button" class="close" data-dismiss="modal">×</button>
+                        </div>
+
+                        <!-- Modal body -->
+                        <div id='.$idDivContent.' class="modal-body" >
+                          
+                        </div>
+
+                        <!-- Modal footer -->
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>');
     }
     
    //Fin Clases

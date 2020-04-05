@@ -1,12 +1,12 @@
 <?php
 
-include_once("../clases/tesoreria.class.php");// se debe incluir la clase del modulo 
+include_once("../clases/main.class.php");// se debe incluir la clase del modulo 
 include_once("../../../constructores/paginas_constructor.php");// siempre debera de ir ya que utilizara html que esta en el constructor
 
 if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente a vacio 
     
     $css =  new PageConstruct("", "", 1, "", 1, 0);// se instancia para poder utilizar el html
-    $obCon = new Tesoreria(1);// se instancia para poder conectarse con la base de datos 
+    $obCon = new Domi(1);// se instancia para poder conectarse con la base de datos 
     
     switch($_REQUEST["Accion"]) {
        

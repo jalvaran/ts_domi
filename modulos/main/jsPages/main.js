@@ -156,6 +156,54 @@ function ListarProductos(idLocal=''){
       });
 }
 
+function AgregarAlCarrito(user_id,local_id,product_id){
+    
+    
+    var idBoton='btnCarAdd_'+product_id;
+    document.getElementById(idBoton).disabled=true;
+    var idObservaciones="Observaciones_"+product_id;
+    var Observaciones=document.getElementById(idObservaciones).value;         
+    var form_data = new FormData();
+        form_data.append('Accion', '1'); 
+        form_data.append('user_id', user_id);
+        form_data.append('local_id', local_id);
+        form_data.append('product_id', product_id);
+        form_data.append('Observaciones', Observaciones);
+        
+        
+        $.ajax({
+        url: './procesadores/main.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idBoton).disabled=false;
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){                
+                alertify.success(respuestas[1]);
+                document.getElementById('spItemsCar').innerHTML=respuestas[2];
+                
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
+                
+            }else{
+                alertify.alert(data);                
+            }
+                    
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;   
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+}
+    
 
 ListarCategoria();
 var idClientUser=getIdClientUser();
