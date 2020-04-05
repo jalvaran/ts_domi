@@ -183,8 +183,9 @@ function AgregarAlCarrito(user_id,local_id,product_id){
             document.getElementById(idBoton).disabled=false;
             var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
             if(respuestas[0]=="OK"){                
-                alertify.success(respuestas[1]);
+                alertify.success(respuestas[1],1000);
                 document.getElementById('spItemsCar').innerHTML=respuestas[2];
+                document.getElementById('spTotalCar').innerHTML=respuestas[4];
                 
             }else if(respuestas[0]=="E1"){  
                 alertify.error(respuestas[1]);
@@ -203,8 +204,51 @@ function AgregarAlCarrito(user_id,local_id,product_id){
       });
     
 }
-    
 
+function ActualizarTotalItemsCarro(user_id){
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '2'); 
+        form_data.append('user_id', user_id);
+                
+        $.ajax({
+        url: './procesadores/main.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){                
+                
+                document.getElementById('spItemsCar').innerHTML=respuestas[1];
+                document.getElementById('spTotalCar').innerHTML=respuestas[3];
+                
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                
+            }else{
+                alertify.alert(data);                
+            }
+                    
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+}
+    
+function VerCarrito(){
+    AbreModal('modalMain');
+}
 ListarCategoria();
 var idClientUser=getIdClientUser();
+
+ActualizarTotalItemsCarro(idClientUser);
 

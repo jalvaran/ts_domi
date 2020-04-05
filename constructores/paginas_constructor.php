@@ -217,7 +217,8 @@ class PageConstruct extends html_estruct_class{
                 <script src="../../assets/vendors/chartjs/Chart.min.js"></script>
                 <script src="../../assets/vendors/jvectormap/jquery-jvectormap.min.js"></script>
                 <script src="../../assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
-                <script src="../../assets/bootstrap/js/bootstrap.min.js"></script>
+                
+                <script src="../../assets/bootstrap/js/popper.min.js"></script>
                 <script src="../../assets/js/dashboard.js"></script>
                 <script src="../../assets/js/jquery.min.js"></script>
                 <script src="../../assets/js/popper.min.js"></script>
@@ -229,7 +230,7 @@ class PageConstruct extends html_estruct_class{
                 <script src="../../assets/js/material.js"></script>
                 <script src="../../general/js/formularios.js"></script>
                 <script src="../../assets/js/misc.js"></script>
-                
+                <script src="../../assets/bootstrap/js/bootstrap.min.js"></script>
                 <!-- endinject -->
                 <!-- Custom js for this page-->
                 
@@ -418,9 +419,10 @@ class PageConstruct extends html_estruct_class{
         
     }
     
-    public function ShoppingCar($js,$id="aShoppingCAr",$idSp="spItemsCar",$Color="#d91d1d") {
+    public function ShoppingCar($js,$id="aShoppingCAr",$idSp="spItemsCar",$idSpTotal="spTotalCar",$Color="#d91d1d") {
         print('<a id="'.$id.'" class="cart-icon mdi mdi-cart" '.$js.' style="color:'.$Color.';">        
-            <span class="cart-icon-sp" id="'.$idSp.'">0</span>        
+            <span class="cart-icon-sp" id="'.$idSp.'">0</span> 
+            <span class="cart-icon-sp-total" id="'.$idSpTotal.'">$0</span>     
         </a>');
     }
     
@@ -452,7 +454,7 @@ class PageConstruct extends html_estruct_class{
 
                         <!-- Modal footer -->
                         <div class="modal-footer">
-                          <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                          <button type="button" class="btn btn-danger" data-dismiss="modal">Cerrar</button>
                         </div>
 
                       </div>

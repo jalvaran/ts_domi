@@ -47,13 +47,27 @@ if( !empty($_REQUEST["Accion"]) ){
                          WHERE ID='$pedido_id'";
             $obCon->Query($sql);
             //obtengo la cantidad de items y el total del pedido
-            $sql="SELECT CantidadItems,Total FROM pedidos WHERE ID='$pedido_id'";
+            $sql="SELECT SUM(CantidadItems) AS CantidadItems,SUM(Total) AS Total FROM pedidos WHERE cliente_id='$user_id' AND Estado=1";
             $DatosPedido=$obCon->FetchAssoc($obCon->Query($sql));
             $Items=$DatosPedido["CantidadItems"];
             $Total=$DatosPedido["Total"];
-            print("OK;Producto Agregado;$Items;$Total");
+            $NumberTotal= number_format($DatosPedido["Total"]);
+            print("OK;Producto Agregado;$Items;$Total;$NumberTotal");
             
         break;//Fin caso 1
+        
+        case 2://Obtenga la cantidad de items en pedidos en curso por un usuario
+            $user_id=$obCon->normalizar($_REQUEST["user_id"]);
+            if($user_id==''){
+                exit("E1;No se recibió el id del usuario");
+            }
+            $sql="SELECT SUM(CantidadItems) AS CantidadItems,SUM(Total) AS Total FROM pedidos WHERE cliente_id='$user_id' AND Estado=1";
+            $DatosPedido=$obCon->FetchAssoc($obCon->Query($sql));
+            $Items=$DatosPedido["CantidadItems"];
+            $Total=$DatosPedido["Total"];
+            $NumberTotal= number_format($DatosPedido["Total"]);
+            print("OK;$Items;$Total;$NumberTotal");
+        break;//fin caso 2    
         
     }
           

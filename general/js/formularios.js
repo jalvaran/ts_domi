@@ -6,9 +6,14 @@
  */
 
 /**
- * Abre el modal para crear un tercero
+ * Abre un modal
  * @returns {undefined}
  */
+
+function AbreModal(idModal){
+    var id="#"+idModal;
+    $(id).modal();
+}
 
 
 function initForm(){

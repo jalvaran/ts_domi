@@ -16,12 +16,8 @@ $css =  new PageConstruct($myTitulo); //instancia para el objeto con las funcion
 $obCon = new conexion(1); //instancia para Conexion a la base de datos
 
 $css->ShoppingCar("onclick=VerCarrito();");
-
 $css->modal("modalMain", "DOMI", "DivModal");
 
-    print('<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalMain">
-        Open modal
-      </button>');
 $css->PageInit($myTitulo);
     
 $css->PageEnd();
