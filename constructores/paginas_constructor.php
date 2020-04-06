@@ -252,11 +252,11 @@ class PageConstruct extends html_estruct_class{
         print('<div id="'.$id.'" class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop mdc-layout-grid__cell--span-12-tablet">');
     }
     
-    public function divCard($Title,$Content,$Footer,$icon,$ColorIcon,$js="",$style="",$jsIcon="",$styleIcon=""){
+    public function divCard($id,$Title,$Content,$Footer,$icon,$ColorIcon,$js="",$style="",$jsIcon="",$styleIcon=""){
         
         
         
-        print('<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet" '.$js.' '.$style.'>
+        print('<div id="'.$id.'" class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet" '.$js.' '.$style.'>
                 <div class="mdc-card info-card info-card--'.$ColorIcon.'">
                   <div class="card-inner">
                     <h5 class="card-title">'.$Title.'</h5>
@@ -338,18 +338,21 @@ class PageConstruct extends html_estruct_class{
         return($html);
     }
     
-    public function getHtmlInput($type,$id,$name,$value,$placeholder,$js="",$style="",$icon='',$iconPostion=1) {
+    public function getHtmlInput($type,$id,$name,$value,$placeholder,$js="",$style="",$icon='',$iconPostion=1,$Habilitado=1) {
         if($iconPostion==1){
             $iconPostion="trailing";
             
         }else{
             $iconPostion="leading";
         }
-        
+        $disabled="";
+        if($Habilitado==0){
+           $disabled="disabled"; 
+        }
         if($type<>"textarea"){
             $html='<div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-'.$iconPostion.'-icon" '.$style.'>
                     <i class="material-icons mdc-text-field__icon">'.$icon.'</i>
-                    <input type="'.$type.'" id="'.$id.'" name="'.$name.'" value="'.$value.'" class="mdc-text-field__input" '.$js.'>
+                    <input type="'.$type.'" id="'.$id.'" name="'.$name.'" value="'.$value.'" class="mdc-text-field__input" '.$js.' '.$disabled.'>
                     <div class="mdc-notched-outline mdc-notched-outline--upgraded">
                       <div class="mdc-notched-outline__leading"></div>
                       <div class="mdc-notched-outline__notch" style="">

@@ -299,6 +299,10 @@ function VerCarrito(){
 
 function EditarCampoItems(Tab,idLocalEdit,TextBox,Field,idEdit){
     var FieldValue=document.getElementById(TextBox).value;
+    if(Field=="Cantidad" && FieldValue<=0){
+        document.getElementById(TextBox).value=1;
+        return;
+    }
     var form_data = new FormData();
         form_data.append('Accion', '3'); 
         form_data.append('Tab', Tab);
@@ -344,11 +348,64 @@ function ActualiceSpTotalItem(idItem){
     var idValorUnitario="ValorUnitario_"+idItem;
     var idCantidad="Cantidad_"+idItem;
     var spTotalItem="spTotalItem_"+idItem;
+    var spCantidadItem="spCantidadItem_"+idItem;
     var ValorUnitario=document.getElementById(idValorUnitario).value;
     var Cantidad=document.getElementById(idCantidad).value;
     var Total=parseFloat(ValorUnitario*Cantidad);
     
     document.getElementById(spTotalItem).innerHTML=number_format(Total);
+    document.getElementById(spCantidadItem).innerHTML=number_format(Cantidad);
+}
+
+function SumaRestaCantidad(Operacion,idCaja,idLocal,idItem){
+    var Cantidad=document.getElementById(idCaja).value;
+    if(Operacion==1){
+        Cantidad=parseInt(Cantidad)+1;
+    }else{
+        Cantidad=parseInt(Cantidad)-1;
+    }
+    document.getElementById(idCaja).value=Cantidad;
+    EditarCampoItems(1,idLocal,idCaja,`Cantidad`,idItem);
+    ActualiceSpTotalItem(idItem);
+}
+
+function EliminarItemPedido(idLocalEdit,idItem,idCardItem){
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '4'); 
+        form_data.append('idLocalEdit', idLocalEdit);
+        form_data.append('idItem', idItem);
+             
+        $.ajax({
+        url: './procesadores/main.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){        
+                //VerCarrito();
+                ActualizarTotalItemsCarro(idClientUser);
+                $("#"+idCardItem).remove();
+                alertify.error(respuestas[1],1000);
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                
+            }else{
+                alertify.alert(data);                
+            }
+                    
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
 }
 
 ListarCategoria();

@@ -108,6 +108,37 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Registro Actualizado");
         break;//Fin caso 3    
         
+        case 4://Eliminar item
+            
+            $idLocalEdit=$obCon->normalizar($_REQUEST["idLocalEdit"]);            
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            
+            if($idLocalEdit==''){
+                exit("E1;No se recibió el local");
+            }
+            
+            if($idItem==''){
+                exit("E1;No se recibió el id");
+            }
+            
+            
+                
+            $dbLocal=$obCon->getDataBaseLocal($idLocalEdit);                
+            
+            $sql="SELECT pedido_id FROM pedidos_items 
+                WHERE ID='$idItem'";
+            $DatosPedido=$obCon->FetchAssoc($obCon->Query2($sql, HOST, USER, PW, $dbLocal, ""));
+            
+            $sql="DELETE FROM pedidos_items 
+                WHERE ID='$idItem'";
+            $obCon->Query2($sql, HOST, USER, PW, $dbLocal, "");
+            
+            $obCon->ActualizarValoresPedido($idLocalEdit, $DatosPedido["pedido_id"]);
+          
+            
+            print("OK;Item Eliminado");
+        break;//Fin caso 4
+        
     }
           
 }else{

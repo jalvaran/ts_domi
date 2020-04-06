@@ -16,7 +16,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             while($DatosCategorias=$obCon->FetchAssoc($Consulta)){
                 $idItem=$DatosCategorias["ID"];
                 $js="onclick=ListarLocales(`$idItem`)";
-                $css->divCard(utf8_encode($DatosCategorias["Nombre"]), utf8_encode($DatosCategorias["Descripcion"]), "", $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
+                $css->divCard("",utf8_encode($DatosCategorias["Nombre"]), utf8_encode($DatosCategorias["Descripcion"]), "", $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
 
             }
         break;//Fin caso 1    
@@ -153,25 +153,29 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 
                 while($DatosItems=$obCon->FetchAssoc($ConsultaItems)){
                     $idItem=$DatosItems["ID"];
-                    
-                    $jsIcon=("onclick=EliminarItemPedido(`$idLocal`,`$idItem`)");
+                    $idCardItem="divCardItem_".$idItem;
+                    $jsIcon=("onclick=EliminarItemPedido(`$idLocal`,`$idItem`,`$idCardItem`)");
                     
                     $ValorUnitario= number_format($DatosItems["ValorUnitario"]);
                     $Cantidad=$DatosItems["Cantidad"];
                     $idTextCantidad="Cantidad_".$idItem; 
                     $idTextValorUnitario="ValorUnitario_".$idItem; 
-                    $htmlCantidad=$css->getHtmlInput("number", $idTextCantidad, $idTextCantidad, $Cantidad, "Cantidad","","onchange=EditarCampoItems(`1`,`$idLocal`,`$idTextCantidad`,`Cantidad`,`$idItem`);ActualiceSpTotalItem(`$idItem`)");
-                    //$htmlValorUnitario=$css->getHtmlInput("hidden", $idTextValorUnitario, $idTextValorUnitario, $DatosItems["ValorUnitario"], "","","");
+                    
+                    $htmlSpCantidad='<div style="text-align:center;width:100px;height:40px;padding: 10px;"><span id="spCantidadItem_'.$idItem.'" style="font-size:20px;">'.number_format($Cantidad).'</span></div>';
+                    $htmlButtonAdd='<button class="btn btn-success" style="width:100px;" onclick=SumaRestaCantidad(`1`,`'.$idTextCantidad.'`,`'.$idLocal.'`,`'.$idItem.'`)><span class="mdi mdi-arrow-up-bold-outline"></span></button>';
+                   // $htmlCantidad=$css->getHtmlInput("hidden", $idTextCantidad, $idTextCantidad, $Cantidad, "","onchange=EditarCampoItems(`1`,`$idLocal`,`$idTextCantidad`,`Cantidad`,`$idItem`);ActualiceSpTotalItem(`$idItem`);",'style=width:100px;','','',0);
+                    $htmlCantidad="<input type='hidden' id='$idTextCantidad' value='$DatosItems[Cantidad]'>";
+                    $htmlButtonMinus='<button class="btn btn-warning" style="width:100px;" onclick=SumaRestaCantidad(`2`,`'.$idTextCantidad.'`,`'.$idLocal.'`,`'.$idItem.'`)><span class="mdi mdi-arrow-down-bold-outline"></span></button>';
                     $htmlValorUnitario='<input type="hidden" id="'.$idTextValorUnitario.'" value="'.$DatosItems["ValorUnitario"].'">';
                     $Total=number_format($DatosItems["Total"]);
                     $TotalPedido=$TotalPedido+$DatosItems["Total"];
                     $htmlBody='<hr>Vr. Unitario: <strong style="font-size:15px;">$'.$ValorUnitario.'</strong>';
-                    $htmlBody.='<hr><strong style="font-size:15px;">'.$htmlValorUnitario.$htmlCantidad.'</strong>';
+                    $htmlBody.='<hr><strong style="font-size:15px;">'.$htmlValorUnitario.$htmlButtonAdd."<br>".$htmlCantidad.$htmlSpCantidad."".$htmlButtonMinus.'</strong>';
                     $htmlBody.='<hr>Total: <strong style="font-size:20px;">$<span id="spTotalItem_'.$idItem.'">'.$Total.'</span></strong>';
                     
                     $idTextObservaciones="Observaciones_".$idItem; 
                     $htmlObservaciones=$css->getHtmlInput("textarea","Observaciones_".$idItem, "Observaciones", $DatosItems["Observaciones"], "Observaciones",'',"onchange=EditarCampoItems(`1`,`$idLocal`,`$idTextObservaciones`,`Observaciones`,`$idItem`)","",1);
-                    $css->divCard(utf8_encode($DatosItems["Nombre"]), ($htmlBody), $htmlObservaciones, "mdi mdi-playlist-remove", "danger","","",$jsIcon,"style=cursor:pointer");       
+                    $css->divCard($idCardItem,utf8_encode($DatosItems["Nombre"]), ($htmlBody), $htmlObservaciones, "mdi mdi-playlist-remove", "danger","","",$jsIcon,"style=cursor:pointer");       
 
                 }
                 
