@@ -16,7 +16,8 @@ $css =  new PageConstruct($myTitulo); //instancia para el objeto con las funcion
 $obCon = new conexion(1); //instancia para Conexion a la base de datos
 
 $css->ShoppingCar("onclick=VerCarrito();");
-$css->modal("modalMain", "DOMI", "DivModal");
+//$css->modal("modalMain", "DOMI", "DivModal");
+//$css->modalMDD("modalMain", "DOMI", "DivModal");
 
 $css->PageInit($myTitulo);
     

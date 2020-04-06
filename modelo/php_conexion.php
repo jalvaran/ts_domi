@@ -353,5 +353,10 @@ class conexion extends db_conexion{
         return (str_replace(".","",uniqid($prefijo, true)));
     }
      
+    public function getDataBaseLocal($idLocal) {
+        $sql="SELECT db FROM locales WHERE ID='$idLocal'";
+        $Datos= $this->FetchAssoc($this->Query($sql));
+        return($Datos["db"]);
+    }
 }
 ?>

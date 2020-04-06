@@ -69,6 +69,45 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;$Items;$Total;$NumberTotal");
         break;//fin caso 2    
         
+        case 3://Editar un campo de una tabla
+            $Tab=$obCon->normalizar($_REQUEST["Tab"]);
+            $idLocalEdit=$obCon->normalizar($_REQUEST["idLocalEdit"]);
+            $Field=$obCon->normalizar($_REQUEST["Field"]);
+            $idEdit=$obCon->normalizar($_REQUEST["idEdit"]);
+            $FieldValue=$obCon->normalizar($_REQUEST["FieldValue"]);
+            
+            if($Tab==''){
+                exit("E1;No se recibió la tabla");
+            }
+            if($idLocalEdit==''){
+                exit("E1;No se recibió el local");
+            }
+            if($Field==''){
+                exit("E1;No se recibió el campo");
+            }
+            if($idEdit==''){
+                exit("E1;No se recibió el id");
+            }
+            
+            if($Tab==1){
+                
+                $dbLocal=$obCon->getDataBaseLocal($idLocalEdit);                
+                $sql="UPDATE pedidos_items SET $Field='$FieldValue', Total=Cantidad*ValorUnitario 
+                        WHERE ID='$idEdit'";
+                $obCon->Query2($sql, HOST, USER, PW, $dbLocal, "");
+                if($Field=="Cantidad"){
+                    $sql="SELECT pedido_id FROM pedidos_items 
+                        WHERE ID='$idEdit'";
+                    $DatosPedido=$obCon->FetchAssoc($obCon->Query2($sql, HOST, USER, PW, $dbLocal, ""));
+                    $obCon->ActualizarValoresPedido($idLocalEdit, $DatosPedido["pedido_id"]);
+                }
+                
+                
+            }
+            
+            print("OK;Registro Actualizado");
+        break;//Fin caso 3    
+        
     }
           
 }else{

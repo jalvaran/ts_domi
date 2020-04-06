@@ -70,7 +70,6 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $html=$css->getHtmlInput("text","BusquedaProducto", "BusquedaProducto", "", "Buscar",'',$style,"search",1);
             $css->divForm("Busqueda", $html, "", "", 6);
             print('<div id="DivProductos" class="mdc-layout-grid__cell--span-12">');
-            //$css->divCol("DivProductos", "DivProductos", 12, "", "");
             
             $css->Cdiv();
         break;//fin caso 3
@@ -101,17 +100,119 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                             
                             
                         $css->Cdiv();
-                            
-
-                        
                     $css->Cdiv();
                 $css->Cdiv();
             $css->Cdiv();
            
-           
-           
-           
-        break;//fin caso 4    
+        break;//fin caso 4   
+        
+        case 5:// Lista de pedidos
+            
+            $idClientUser=$obCon->normalizar($_REQUEST["idClientUser"]);
+            if($idClientUser==''){
+                exit("No se recibió el id del usuario");
+            }
+            $sql="SELECT t1.*,t2.Nombre,t2.Telefono,t2.Direccion,t2.db  
+                    FROM pedidos t1 INNER JOIN locales t2 ON t1.local_id=t2.ID 
+                     
+                    WHERE t1.cliente_id='$idClientUser' AND t1.Estado=1 ORDER BY local_id ASC";            
+            $Consulta=$obCon->Query($sql);
+            
+            $TotalPedido=0;
+                            
+            while($DatosPedido=$obCon->FetchAssoc($Consulta)){
+                $html="";
+                $idPedido=$DatosPedido["ID"];
+                $idLocal=$DatosPedido["local_id"];
+                $db=$DatosPedido["db"];
+                //$Titulo='Pedido para '.$DatosPedido["Nombre"].', Telefono: '.$DatosPedido["Telefono"].', '.$DatosPedido["Direccion"]; 
+                $htmlTitulo='<table style="width:100%;">
+                                <tr>
+                                    <td colspan=2 style="text-align:center"><strong>Orden de pedido No. </strong>'.$DatosPedido["ID"].'</td>
+                                </tr> 
+                                <tr>
+                                    <td><strong>Local:</strong></td>
+                                    <td onclick="DibujaLocal(`'.$idLocal.'`)" style="text-align:right;cursor:pointer;">'.$DatosPedido["Nombre"].' <span class="mdi mdi-eye"></span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Telefono:</strong></td>
+                                    <td style="text-align:right">'.$DatosPedido["Telefono"].'</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Direccion:</strong></td>
+                                    <td style="text-align:right">'.$DatosPedido["Direccion"].'</td>
+                                </tr>
+                            </table>';
+                $css->CrearTitulo($htmlTitulo,5);
+                
+                $sql="SELECT t1.*,t2.Nombre,t2.DescripcionCorta,t2.Referencia 
+                         FROM pedidos_items t1 INNER JOIN productos_servicios t2 ON t1.product_id=t2.ID
+                         
+                            WHERE t1.pedido_id='$idPedido' ";
+                $ConsultaItems=$obCon->Query2($sql, HOST, USER, PW, $db, "");
+                
+                while($DatosItems=$obCon->FetchAssoc($ConsultaItems)){
+                    $idItem=$DatosItems["ID"];
+                    
+                    $jsIcon=("onclick=EliminarItemPedido(`$idLocal`,`$idItem`)");
+                    
+                    $ValorUnitario= number_format($DatosItems["ValorUnitario"]);
+                    $Cantidad=$DatosItems["Cantidad"];
+                    $idTextCantidad="Cantidad_".$idItem; 
+                    $idTextValorUnitario="ValorUnitario_".$idItem; 
+                    $htmlCantidad=$css->getHtmlInput("number", $idTextCantidad, $idTextCantidad, $Cantidad, "Cantidad","","onchange=EditarCampoItems(`1`,`$idLocal`,`$idTextCantidad`,`Cantidad`,`$idItem`);ActualiceSpTotalItem(`$idItem`)");
+                    //$htmlValorUnitario=$css->getHtmlInput("hidden", $idTextValorUnitario, $idTextValorUnitario, $DatosItems["ValorUnitario"], "","","");
+                    $htmlValorUnitario='<input type="hidden" id="'.$idTextValorUnitario.'" value="'.$DatosItems["ValorUnitario"].'">';
+                    $Total=number_format($DatosItems["Total"]);
+                    $TotalPedido=$TotalPedido+$DatosItems["Total"];
+                    $htmlBody='<hr>Vr. Unitario: <strong style="font-size:15px;">$'.$ValorUnitario.'</strong>';
+                    $htmlBody.='<hr><strong style="font-size:15px;">'.$htmlValorUnitario.$htmlCantidad.'</strong>';
+                    $htmlBody.='<hr>Total: <strong style="font-size:20px;">$<span id="spTotalItem_'.$idItem.'">'.$Total.'</span></strong>';
+                    
+                    $idTextObservaciones="Observaciones_".$idItem; 
+                    $htmlObservaciones=$css->getHtmlInput("textarea","Observaciones_".$idItem, "Observaciones", $DatosItems["Observaciones"], "Observaciones",'',"onchange=EditarCampoItems(`1`,`$idLocal`,`$idTextObservaciones`,`Observaciones`,`$idItem`)","",1);
+                    $css->divCard(utf8_encode($DatosItems["Nombre"]), ($htmlBody), $htmlObservaciones, "mdi mdi-playlist-remove", "danger","","",$jsIcon,"style=cursor:pointer");       
+
+                }
+                
+                
+            }
+                
+                $inputObservaciones=$css->getHtmlInput("textarea", "ObservacionesPedido_".$DatosPedido["ID"], "ObservacionesPedido_".$DatosPedido["ID"], "", "Observaciones Generales","");
+                
+                $inputNombre=$css->getHtmlInput("text", "NombreCliente", "NombreCliente", "", "Nombre","","","input",1);
+                $inputDireccion=$css->getHtmlInput("text", "DireccionCliente", "DireccionCliente", "", "Direccion","","","home",1);
+                $inputTelefono=$css->getHtmlInput("text", "Telefono", "Telefono", "", "Telefono","","","telephone",1);
+                $htmInputs="<br>".$inputNombre."<br>".$inputDireccion."<br>".$inputTelefono."<br>".$inputObservaciones;
+                $htmlBotonCancelar=$css->getHtmlBoton(2, "btnDescartarPedido", "btnDescartarPedido", "Descartar", "onclick=ConfimarDescartarPedidos(`$idClientUser`)", "width:100px;");
+                $htmlBotonConfirmar=$css->getHtmlBoton(1, "btnGuardarPedido", "btnGuardarPedido", "Solicitar", "onclick=ConfimarSolicitarPedidos(`$idClientUser`)", "width:100px;");
+                $htmlFormPedido='<table style="width:100%;background-color:white">
+                                <tr>
+                                    <td><strong>Total de este Pedido:</strong></td>
+                                    <td style="text-align:right"><strong>$<span id="spTotalFormPedido">'. number_format($TotalPedido).'</span></strong></td>
+                                </tr>
+                                <tr>
+                                    <td colspan=2 style="text-align:center"><br>'.$inputNombre.'</td>
+                                </tr> 
+                                <tr>
+                                    <td colspan=2 style="text-align:center"><br>'.$inputDireccion.'</td>
+                                </tr> 
+                                <tr>
+                                    <td colspan=2 style="text-align:center"><br>'.$inputTelefono.'</td>
+                                </tr> 
+                                <tr>
+                                    <td colspan=2 style="text-align:center"><br>'.$inputObservaciones.'<br></td>
+                                </tr> 
+                                <tr>
+                                    <td>'.$htmlBotonCancelar.'</td>
+                                    <td style="text-align:right">'.$htmlBotonConfirmar.'</td>
+                                </tr>
+                                
+                                
+                            </table>';
+                $css->CrearTitulo($htmlFormPedido,8);
+            
+        break;//Fin caso 5    
         
  }
     

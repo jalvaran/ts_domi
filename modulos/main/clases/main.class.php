@@ -21,7 +21,7 @@ class Domi extends conexion{
     }
     
     public function CrearPedido($user_id,$local_id,$Total,$Observaciones,$Estado) {
-        $sql="SELECT ID FROM pedidos WHERE cliente_id='$user_id' AND Estado=1;";
+        $sql="SELECT ID FROM pedidos WHERE cliente_id='$user_id' AND local_id='$local_id' AND Estado=1;";
         $Validacion= $this->FetchAssoc($this->Query($sql));        
         if($Validacion['ID']<>''){
             return($Validacion['ID']);
@@ -76,6 +76,21 @@ class Domi extends conexion{
         return($ID);
     }
     
+    
+    public function ActualizarValoresPedido($idLocal,$idPedido) {
+        $dbLocal=$this->getDataBaseLocal($idLocal);
+        $sql="SELECT SUM(Cantidad) as Items, SUM(Total) AS Total FROM pedidos_items WHERE pedido_id='$idPedido' ";
+        
+        $DatosItems= $this->FetchAssoc($this->Query2($sql, HOST, USER, PW, $dbLocal, ""));
+        
+        $Cantidad=$DatosItems["Items"];
+        
+        $Total=$DatosItems["Total"];
+        $sql="UPDATE pedidos SET CantidadItems='$Cantidad', Total='$Total' WHERE ID='$idPedido'";
+        $this->Query($sql);
+        
+        
+    }
    
     /**
      * Fin Clase
