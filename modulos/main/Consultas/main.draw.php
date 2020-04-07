@@ -181,7 +181,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 
                 
             }
-                
+            if($TotalPedido>0){
                 $inputObservaciones=$css->getHtmlInput("textarea", "ObservacionesPedido_".$DatosPedido["ID"], "ObservacionesPedido_".$DatosPedido["ID"], "", "Observaciones Generales","");
                 
                 $inputNombre=$css->getHtmlInput("text", "NombreCliente", "NombreCliente", "", "Nombre","","","input",1);
@@ -215,7 +215,9 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                                 
                             </table>';
                 $css->CrearTitulo($htmlFormPedido,8);
-            
+            }else{
+                $css->CrearTitulo("<strong>Tu Cesta está vacía!<strong>",4);
+            }
         break;//Fin caso 5    
         
  }

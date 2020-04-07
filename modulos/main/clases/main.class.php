@@ -91,6 +91,15 @@ class Domi extends conexion{
         
         
     }
+    
+    function ActualiceDatosCliente($idCliente,$Nombre,$Direccion,$Telefono) {
+        $Datos["Nombre"]=$Nombre;
+        $Datos["Direccion"]=$Direccion;
+        $Datos["Telefono"]=$Telefono;
+        $sql=$this->getSQLUpdate("client_user", $Datos);
+        $sql.=" WHERE ID='$idCliente'";
+        $this->Query($sql);
+    }
    
     /**
      * Fin Clase

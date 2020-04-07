@@ -1,0 +1,48 @@
+
+.pageNav {
+  position: absolute;
+  width: auto;
+  left: -500%;
+  list-style: none;
+  background: #fff;
+  
+  border-radius: 4px;
+  top: -1.5em;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.pageNav-home-icon {
+  position: fixed;
+  cursor:pointer;
+  z-index: 2;
+  bottom: 2%;
+  left: 50%;
+  height: 50px;
+  width: 50px;
+  font-size:50px;
+  
+}
+
+.pageNav-back-icon {
+  position: fixed;
+  cursor:pointer;
+  z-index: 2;
+  bottom: 2%;
+  left: 2%;
+  height: 50px;
+  width: 50px;
+  font-size:50px;
+  
+}
+
+.pageNav-forward-icon {
+  position: fixed;
+  cursor:pointer;
+  z-index: 2;
+  bottom: 2%;
+  right: 2%;
+  height: 50px;
+  width: 50px;
+  font-size:50px;
+  
+}

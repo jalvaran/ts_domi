@@ -6,19 +6,37 @@
 
 var idPantalla=1;
 var lastLocal=1;
+var lastCategory=1;
 function VerPantallaSegunID(){
     if(idPantalla==1){
         ListarCategoria();
     }
     if(idPantalla==2){
-        ListarLocales();
+        ListarLocales(lastCategory);
     }
     if(idPantalla==3){
         DibujaLocal(lastLocal);
     }
     if(idPantalla==4){
+        ListarProductos(lastLocal);
+    }
+    if(idPantalla==5){
         VerCarrito();
     }
+}
+
+function ListarAnterior(){
+    if(idPantalla>1){
+        idPantalla=idPantalla-1;
+    }
+    VerPantallaSegunID();
+}
+
+function ListarSiguiente(){
+    if(idPantalla<5){
+        idPantalla=parseInt(idPantalla)+1;
+    }
+    VerPantallaSegunID();
 }
 function getIdClientUser(){
     var idClientUser = Cookies.get('idClientUser');    
@@ -59,6 +77,7 @@ function setTextareaHeight(textareas) {
 
 
 function ListarCategoria(){
+    idPantalla=1;
     var idDiv="divMain";
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
     
@@ -85,6 +104,8 @@ function ListarCategoria(){
 }
 
 function ListarLocales(Categoria=''){
+    idPantalla=2;
+    lastCategory=Categoria;
     var idDiv="divMain";
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
     
@@ -112,6 +133,7 @@ function ListarLocales(Categoria=''){
 }
 
 function DibujaLocal(idLocal=''){
+    idPantalla=3;
     lastLocal=idLocal;
     var idDiv="divMain";
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
@@ -144,7 +166,8 @@ function DibujaLocal(idLocal=''){
 
 
 function ListarProductos(idLocal=''){
-    
+    idPantalla=4;
+    lastLocal=idLocal;
     var idDiv="DivProductos";
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
     
@@ -268,7 +291,8 @@ function ActualizarTotalItemsCarro(user_id){
 }
     
 function VerCarrito(){
-        
+    idPantalla=5;
+    
     var idDiv="divMain";
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
     
@@ -395,6 +419,118 @@ function EliminarItemPedido(idLocalEdit,idItem,idCardItem){
             }else if(respuestas[0]=="E1"){  
                 alertify.error(respuestas[1]);
                 
+            }else{
+                alertify.alert(data);                
+            }
+                    
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function ConfimarSolicitarPedidos(idUserClient){
+    
+    alertify.confirm('Seguro que desea Realizar el pedido? ',
+        function (e) {
+            if (e) {
+                CrearPedido(idUserClient);
+            }else{
+                alertify.error("Se canceló el proceso");
+                return;
+            }
+        });
+
+}
+
+
+function CrearPedido(idUserClient){
+    var NombreCliente=document.getElementById('NombreCliente').value;
+    var DireccionCliente=document.getElementById('DireccionCliente').value;
+    var Telefono=document.getElementById('Telefono').value;
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '5'); 
+        form_data.append('NombreCliente', NombreCliente);
+        form_data.append('DireccionCliente', DireccionCliente);
+        form_data.append('Telefono', Telefono);
+        form_data.append('idUserClient', idUserClient);
+                        
+        $.ajax({
+        url: './procesadores/main.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){ 
+                alertify.alert(respuestas[1]);
+                VerCarrito();
+                ActualizarTotalItemsCarro(idClientUser);
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
+            }else{
+                alertify.alert(data);                
+            }
+                    
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+}
+
+function ConfimarDescartarPedidos(idUserClient){
+    
+    alertify.confirm('Seguro que desea Descartar este pedido? ',
+        function (e) {
+            if (e) {
+                DescartarPedidos(idUserClient);
+            }else{
+                alertify.error("Se canceló el proceso");
+                return;
+            }
+        });
+
+}
+
+function DescartarPedidos(idUserClient){
+        
+    var form_data = new FormData();
+        form_data.append('Accion', '6'); 
+        
+        form_data.append('idUserClient', idUserClient);
+                        
+        $.ajax({
+        url: './procesadores/main.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){ 
+                alertify.alert(respuestas[1]);
+                VerCarrito();
+                ActualizarTotalItemsCarro(idClientUser);
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
             }else{
                 alertify.alert(data);                
             }

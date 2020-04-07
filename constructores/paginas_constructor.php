@@ -40,6 +40,7 @@ class PageConstruct extends html_estruct_class{
                         <!-- Layout styles -->
                         <link rel="stylesheet" href="../../assets/css/demo/style.css">
                         <link rel="stylesheet" href="../../assets/css/techno/carrito.css">
+                        <link rel="stylesheet" href="../../assets/css/techno/navegacion_techno.css">
                         
                         <!-- End layout styles -->
                         <link rel="shortcut icon" href="../../assets/images/favicon.png" />');
@@ -124,7 +125,7 @@ class PageConstruct extends html_estruct_class{
             
           <div class="menu-button-container">
               <button class="mdc-button mdc-menu-button" onclick=ListarCategoria()>
-                <i class="mdi mdi-home"></i>
+                
               </button>
           </div>
 
@@ -134,7 +135,7 @@ class PageConstruct extends html_estruct_class{
             
             <div class="menu-button-container">
               <button class="mdc-button mdc-menu-button">
-                <i class="mdi mdi-login"></i>
+                
               </button>
               <div class="mdc-menu mdc-menu-surface" tabindex="-1">
                 <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical">
@@ -195,7 +196,7 @@ class PageConstruct extends html_estruct_class{
           <div class="mdc-layout-grid">
             <div class="mdc-layout-grid__inner">
               <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-6-desktop">
-                <span class="tx-14">Copyright © 2019 <a href="https://www.technosoluciones.com.co/" target="_blank">TECHNO SOLUCIONES SAS</a>. All rights reserved.</span>
+                <span class="tx-14">Copyright © 2020 <a href="https://www.technosoluciones.com.co/" target="_blank">TECHNO SOLUCIONES SAS</a>. All rights reserved.</span>
               </div>
               <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-6-desktop d-flex justify-content-end">
                 
@@ -433,6 +434,11 @@ class PageConstruct extends html_estruct_class{
         print('<a id="'.$id.'" class="cart-icon mdi mdi-cart" '.$js.' style="color:'.$Color.';">        
             <span class="cart-icon-sp" id="'.$idSp.'">0</span> 
             <span class="cart-icon-sp-total" id="'.$idSpTotal.'">0</span>     
+        </a>');
+    }
+    
+    public function botonNavegacion($js,$Color,$class,$id="") {
+        print('<a id="'.$id.'" class="'.$class.'" '.$js.' style="color:'.$Color.';">             
         </a>');
     }
     

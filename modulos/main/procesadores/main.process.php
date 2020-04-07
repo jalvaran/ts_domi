@@ -139,6 +139,46 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Item Eliminado");
         break;//Fin caso 4
         
+        case 5://Solicitar pedido
+            $idUserClient=$obCon->normalizar($_REQUEST["idUserClient"]);  
+            $NombreCliente=$obCon->normalizar($_REQUEST["NombreCliente"]);  
+            $DireccionCliente=$obCon->normalizar($_REQUEST["DireccionCliente"]);  
+            $Telefono=$obCon->normalizar($_REQUEST["Telefono"]);  
+            
+            if($idUserClient==""){
+                exit("E1;No se recibió el id del cliente");
+            }
+            if($NombreCliente==""){
+                exit("E1;Debes escribir tu Nombre;NombreCliente");
+            }
+            if($DireccionCliente==""){
+                exit("E1;Debes escribir una dirección para poder enviarte el pedido;DireccionCliente");
+            }
+            if($Telefono==""){
+                exit("E1;Debes escribir un Número Telefónico;Telefono");
+            }
+            
+            $obCon->ActualiceDatosCliente($idUserClient, $NombreCliente, $DireccionCliente, $Telefono);
+            
+            $sql="UPDATE pedidos SET Estado=2 WHERE cliente_id='$idUserClient' AND Estado=1";
+            $obCon->Query($sql);
+            
+            print("OK;Tu Pedido ha sido Solicitado");
+        break;//Fin caso 5   
+        
+        case 6://Descartar pedido
+            $idUserClient=$obCon->normalizar($_REQUEST["idUserClient"]);  
+            
+            if($idUserClient==""){
+                exit("E1;No se recibió el id del cliente");
+            }
+            
+            $sql="UPDATE pedidos SET Estado=20 WHERE cliente_id='$idUserClient' AND Estado=1";
+            $obCon->Query($sql);
+            
+            print("OK;Tu Pedido fué descartado");
+        break;//Fin caso 6
+        
     }
           
 }else{

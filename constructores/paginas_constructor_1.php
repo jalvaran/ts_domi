@@ -27,8 +27,7 @@ class PageConstruct extends html_estruct_class{
                         <title>DomiBuga</title>
                         <!-- plugins:css -->
                         <link rel="stylesheet" href="../../assets/bootstrap/css/bootstrap.min.css">
-                        <link rel="stylesheet" href="../../assets/vendors/mdi/css/materialdesignicons.min.css">
-                        
+                        <link rel="stylesheet" href="../../assets/vendors/mdi/css/materialdesignicons.min.css">                        
                         <link rel="stylesheet" href="../../assets/vendors/css/vendor.bundle.base.css">
                         
                         <!-- endinject -->
@@ -39,8 +38,12 @@ class PageConstruct extends html_estruct_class{
                         <link rel="stylesheet" href="../../assets/alertify/themes/alertify.default.css" id="toggleCSS" />
                         <!-- End plugin css for this page -->
                         <!-- Layout styles -->
-                        <link rel="stylesheet" href="../../assets/css/demo/style.css">
                         <link rel="stylesheet" href="../../assets/css/techno/carrito.css">
+                        <link rel="stylesheet" href="../../assets/css/techno/navegacion.css">
+                        <link rel="stylesheet" href="../../assets/css/demo/style.css">
+                        
+                        
+                        
                         <!-- End layout styles -->
                         <link rel="shortcut icon" href="../../assets/images/favicon.png" />');
             $this->Chead();
@@ -122,7 +125,7 @@ class PageConstruct extends html_estruct_class{
           </div>
           <div class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end mdc-top-app-bar__section-right">
             
-         
+          
 
             <div class="divider d-none d-md-block"></div>
             
@@ -208,25 +211,23 @@ class PageConstruct extends html_estruct_class{
         print('<script src="../../assets/vendors/js/vendor.bundle.base.js"></script>
                 <!-- endinject -->
                 <!-- Plugin js for this page-->
-                <script src="../../assets/js/jquery.min.js"></script>
-                <script src="../../assets/bootstrap/js/bootstrap.min.js"></script>
                 <script src="../../assets/vendors/chartjs/Chart.min.js"></script>
                 <script src="../../assets/vendors/jvectormap/jquery-jvectormap.min.js"></script>
                 <script src="../../assets/vendors/jvectormap/jquery-jvectormap-world-mill-en.js"></script>
                 
-                
-                <script src="../../assets/bootstrap/js/popper.min.js"></script>
                 <script src="../../assets/js/dashboard.js"></script>
-                
+                <script src="../../assets/js/jquery.min.js"></script>
+                <script src="../../assets/js/material.js"></script>
+                <script src="../../assets/bootstrap/js/bootstrap.min.js"></script>
                 <script src="../../assets/js/popper.min.js"></script>
                 <!-- End plugin js for this page-->
                 <!-- inject:js -->
                 <script src="../../assets/alertify/lib/alertify.min.js"></script>
                 <script src="../../assets/js/uuid.min.js"></script>
                 <script src="../../assets/js/js.cookie.js"></script>
-                
-                <script src="../../assets/js/material.js"></script>
                 <script src="../../general/js/formularios.js"></script>
+                <script src="../../general/js/number_format.js"></script>
+                
                 <script src="../../assets/js/misc.js"></script>
                 
                 <!-- endinject -->
@@ -249,17 +250,17 @@ class PageConstruct extends html_estruct_class{
         print('<div id="'.$id.'" class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop mdc-layout-grid__cell--span-12-tablet">');
     }
     
-    public function divCard($Title,$Content,$Footer,$icon,$ColorIcon,$js="",$style=""){
+    public function divCard($id,$Title,$Content,$Footer,$icon,$ColorIcon,$js="",$style="",$jsIcon="",$styleIcon=""){
         
         
         
-        print('<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet" '.$js.' '.$style.'>
+        print('<div id="'.$id.'" class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-3-tablet" '.$js.' '.$style.'>
                 <div class="mdc-card info-card info-card--'.$ColorIcon.'">
                   <div class="card-inner">
                     <h5 class="card-title">'.$Title.'</h5>
                     <h5 class="font-weight-light pb-2 mb-1 border-bottom">'.$Content.'</h5>
-                    <p class="tx-12 text-muted">'.$Footer.'</p>
-                    <div class="card-icon-wrapper">
+                    <p class="tx-12 text">'.$Footer.'</p>
+                    <div '.$jsIcon.' class="card-icon-wrapper" '.$styleIcon.'>
                       <i class="'.$icon.'"></i>
                     </div>
                   </div>
@@ -296,12 +297,12 @@ class PageConstruct extends html_estruct_class{
               </div>');
     }
     
-    public function divForm($Title,$Content,$js="",$style="",$Cols=6,$ColorIcon="info"){
+    public function divForm($Title,$Content,$js="",$style="",$Cols=6,$ColorIcon="info",$styleTitle=""){
         
         print('<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop mdc-layout-grid__cell--span-'.$Cols.'-tablet" '.$js.' '.$style.'>
                 <div class="mdc-card info-card info-card--'.$ColorIcon.'">
                   <div class="card-inner">
-                    <h3 class="">'.$Title.'</h3>
+                    <h3 class="" '.$styleTitle.' >'.$Title.'</h3>
                     '.$Content.'                    
                   </div>
                 </div>
@@ -335,18 +336,21 @@ class PageConstruct extends html_estruct_class{
         return($html);
     }
     
-    public function getHtmlInput($type,$id,$name,$value,$placeholder,$js="",$style="",$icon='',$iconPostion=1) {
+    public function getHtmlInput($type,$id,$name,$value,$placeholder,$js="",$style="",$icon='',$iconPostion=1,$Habilitado=1) {
         if($iconPostion==1){
             $iconPostion="trailing";
             
         }else{
             $iconPostion="leading";
         }
-        
+        $disabled="";
+        if($Habilitado==0){
+           $disabled="disabled"; 
+        }
         if($type<>"textarea"){
             $html='<div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-'.$iconPostion.'-icon" '.$style.'>
                     <i class="material-icons mdc-text-field__icon">'.$icon.'</i>
-                    <input type="'.$type.'" id="'.$id.'" name="'.$name.'" value="'.$value.'" class="mdc-text-field__input" '.$js.'>
+                    <input type="'.$type.'" id="'.$id.'" name="'.$name.'" value="'.$value.'" class="mdc-text-field__input" '.$js.' '.$disabled.'>
                     <div class="mdc-notched-outline mdc-notched-outline--upgraded">
                       <div class="mdc-notched-outline__leading"></div>
                       <div class="mdc-notched-outline__notch" style="">
@@ -375,11 +379,17 @@ class PageConstruct extends html_estruct_class{
     }
     
     public function getHtmlBoton($type,$id,$name,$value,$js,$moreStyles="") {
-        
+        $moreClass="";
         if($type==1){
             $Color="--mdc-ripple-fg-size:57px; --mdc-ripple-fg-scale:1.9678808653005644; --mdc-ripple-fg-translate-start:27.5px, -8.5px; --mdc-ripple-fg-translate-end:19.308334350585938px, -10.5px";
+            
         }
-        $html='<button id="'.$id.'" name="'.$name.'"  '.$js.' class="mdc-button mdc-button--raised mdc-ripple-upgraded" style="'.$Color.';width:100%;'.$moreStyles.'">
+        if($type==2){
+            $Color="--mdc-ripple-fg-size:65px; --mdc-ripple-fg-scale:1.9291179361344377; --mdc-ripple-fg-translate-start:39.5px, -22.5px; --mdc-ripple-fg-translate-end:22.316665649414062px, -14.5px;";
+            $moreClass="filled-button--secondary";
+            
+        }
+        $html='<button id="'.$id.'" name="'.$name.'"  '.$js.' class="mdc-button mdc-button--raised '.$moreClass.' mdc-ripple-upgraded" style="'.$Color.';width:100%;'.$moreStyles.'">
                 '.$value.'
               </button>';
         return($html);
@@ -420,7 +430,12 @@ class PageConstruct extends html_estruct_class{
     public function ShoppingCar($js,$id="aShoppingCAr",$idSp="spItemsCar",$idSpTotal="spTotalCar",$Color="#d91d1d") {
         print('<a id="'.$id.'" class="cart-icon mdi mdi-cart" '.$js.' style="color:'.$Color.';">        
             <span class="cart-icon-sp" id="'.$idSp.'">0</span> 
-            <span class="cart-icon-sp-total" id="'.$idSpTotal.'">$0</span>     
+            <span class="cart-icon-sp-total" id="'.$idSpTotal.'">0</span>     
+        </a>');
+    }
+    
+    public function botonNavegacion($js,$Color,$class,$id="") {
+        print('<a id="'.$id.'" class="'.$class.'" '.$js.' style="color:'.$Color.';">             
         </a>');
     }
     
@@ -458,6 +473,105 @@ class PageConstruct extends html_estruct_class{
                       </div>
                     </div>
                   </div>');
+    }
+    
+    public function modalMDD($id,$Titulo,$idDivContent,$Tipo=2) {
+        $ClassLarge="";
+        if($Tipo==1){
+            $ClassLarge="modal-sm";
+        }
+        if($Tipo==2){
+            $ClassLarge="modal-lg";
+        }
+        if($Tipo==3){
+            $ClassLarge="modal-xl";
+        }
+        print('<div class="modal fade" id="'.$id.'" tabindex="-1" role="dialog" aria-labelledby="myModalLabel-2">
+		<div class="modal-dialog modal-dialog modal-dialog-scrollable '.$ClassLarge.'" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h4 class="modal-title" id="myModalLabel-2">'.$Titulo.'</h4>
+				</div>
+
+				<div id="'.$idDivContent.'" class="modal-body" >
+					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec in ligula id sem tristique ultrices eget id neque. Duis enim turpis, tempus at accumsan vitae, lobortis id sapien. Pellentesque nec orci mi, in pharetra ligula. Nulla facilisi. Nulla facilisi. Mauris convallis venenatis massa, quis consectetur felis ornare quis. Sed aliquet nunc ac ante molestie ultricies. Nam pulvinar ultricies bibendum.</p>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-dialog" data-dismiss="modal">Cerrar</button>
+					
+				</div>
+                                
+			</div><!-- modal-content -->
+		</div><!-- modal-dialog -->
+	</div><!-- modal -->');
+        
+    }
+    
+    function getHtmlTable($Titulo,$Columnas,$Filas){
+        $html='<div class="mdc-card p-0">
+                  <h6 class="card-title card-padding pb-0">'.$Titulo.'</h6>
+                  <div class="table">
+                    <table class="table table-striped">
+                      <thead>
+                        <tr>';
+        
+        foreach ($Columnas as $key => $value) {
+            $html.='<th class="text-left">'.$value.'</th>';
+        }
+        
+        $html.='</tr>
+                </thead>
+                      <tbody>
+                ';
+        foreach ($Filas as $DatosItems) {
+            $html.='<tr>';
+            foreach ($DatosItems as $key => $value) {
+
+                $html.='<td>'.$value.'</td>';
+                        
+                        
+            }
+            $html.='</tr>';
+        }
+        $html.='</tbody>
+                    </table>
+                  </div>
+                </div>
+                ';
+        
+        return($html);
+    }
+    
+    public function CrearTitulo($Titulo,$Tipo=1) {
+        $Color="success";
+        if($Tipo==1){
+            $Color="success";
+        }
+        if($Tipo==2){
+            $Color="info";
+        }
+        if($Tipo==3){
+            $Color="warning";
+        }
+        if($Tipo==4){
+            $Color="danger";
+        }
+        if($Tipo==5){
+            $Color="primary";
+        }
+        if($Tipo==6){
+            $Color="secondary";
+        }
+        if($Tipo==7){
+            $Color="dark";
+        }
+        if($Tipo==8){
+            $Color="light";
+        }
+        print('<div class="alert alert-'.$Color.' mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12-desktop mdc-layout-grid__cell--span-12-tablet">
+            '.$Titulo.'
+          </div>');
     }
     
    //Fin Clases

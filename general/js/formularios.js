@@ -325,3 +325,13 @@ function CompletaRazonSocial() {
 
 
 }
+
+
+function MarqueErrorElemento(idElemento){
+    console.log(idElemento);
+    if(idElemento==undefined){
+       return; 
+    }
+    document.getElementById(idElemento).style.backgroundColor="pink";
+    document.getElementById(idElemento).focus();
+}

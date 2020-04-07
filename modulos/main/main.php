@@ -16,8 +16,10 @@ $css =  new PageConstruct($myTitulo); //instancia para el objeto con las funcion
 $obCon = new conexion(1); //instancia para Conexion a la base de datos
 
 $css->ShoppingCar("onclick=VerCarrito();");
+$css->botonNavegacion("onclick=ListarCategoria()", "black", "pageNav-home-icon mdi mdi-home");
+$css->botonNavegacion("onclick=ListarAnterior()", "black", "pageNav-back-icon mdi mdi-skip-backward");
+$css->botonNavegacion("onclick=ListarSiguiente()", "black", "pageNav-forward-icon mdi mdi-skip-forward");
 //$css->modal("modalMain", "DOMI", "DivModal");
-//$css->modalMDD("modalMain", "DOMI", "DivModal");
 
 $css->PageInit($myTitulo);
     
