@@ -3,6 +3,8 @@
 include_once("../clases/main.class.php");// se debe incluir la clase del modulo 
 include_once("../../../constructores/paginas_constructor.php");// siempre debera de ir ya que utilizara html que esta en el constructor
 
+$ipUser=$_SERVER['REMOTE_ADDR'];
+
 if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente a vacio 
     
     $css =  new PageConstruct("", "", 1, "", 1, 0);// se instancia para poder utilizar el html
@@ -11,6 +13,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
     switch($_REQUEST["Accion"]) {
        
         case 1://Listar las categorias
+            
             $sql="SELECT * FROM catalogo_categorias WHERE Estado=1 ORDER BY Orden ASC";
             $Consulta=$obCon->Query($sql);
             while($DatosCategorias=$obCon->FetchAssoc($Consulta)){
@@ -19,6 +22,11 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 $css->divCard("",utf8_encode($DatosCategorias["Nombre"]), utf8_encode($DatosCategorias["Descripcion"]), "", $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
 
             }
+            
+            $idCliente=$obCon->normalizar($_REQUEST["idClientUser"]);
+            $idPantalla=$obCon->normalizar($_REQUEST["idPantalla"]); 
+            $obCon->logVisit($idCliente, $idPantalla, 0, $ipUser);
+            
         break;//Fin caso 1    
         case 2://dibuja el listado de los locales
             $idCategoria=$obCon->normalizar($_REQUEST["Categoria"]);
@@ -69,13 +77,18 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             
             $html=$css->getHtmlInput("text","BusquedaProducto", "BusquedaProducto", "", "Buscar",$js,$style,"search",1);
             $css->divForm("Busqueda", $html, "", "", 6);
+            
+            $idCliente=$obCon->normalizar($_REQUEST["idClientUser"]);
+            $idPantalla=$obCon->normalizar($_REQUEST["idPantalla"]); 
+            $obCon->logVisit($idCliente, $idPantalla, $idLocal, $ipUser);
+            
             print('<div id="DivProductos" class="mdc-layout-grid__cell--span-12">');
             
             $css->Cdiv();
         break;//fin caso 3
         
         case 4://lista los productos
-            $Limit=10;
+            $Limit=1;
             $idLocal=$obCon->normalizar($_REQUEST["idLocal"]);
             $BusquedaProducto=$obCon->normalizar($_REQUEST["BusquedaProducto"]);
             $cmbClasificacion=$obCon->normalizar($_REQUEST["cmbClasificacion"]);
@@ -258,6 +271,11 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             }else{
                 $css->CrearTitulo("<strong>Tu Cesta está vacía!<strong>",4);
             }
+            
+            $idCliente=$obCon->normalizar($_REQUEST["idClientUser"]);
+            $idPantalla=$obCon->normalizar($_REQUEST["idPantalla"]); 
+            $obCon->logVisit($idCliente, $idPantalla, 0, $ipUser);
+            
         break;//Fin caso 5    
         
         case 6://dibuja el listado de los locales de acuerdo a la busqueda

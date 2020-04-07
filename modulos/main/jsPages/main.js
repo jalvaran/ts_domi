@@ -8,6 +8,7 @@ var idPantalla=1;
 var lastLocal=1;
 var lastCategory=1;
 var Page=1;
+var idClientUser=getIdClientUser();
 function VerPantallaSegunID(){
     
     if(idPantalla==1){
@@ -43,12 +44,12 @@ function pageMinus(){
     if(Page>1){
         Page=parseInt(Page)-1;
     }
-    VerPantallaSegunID();
+    ListarProductos(lastLocal);
 }
 
 function pageAdd(){
     Page=parseInt(Page)+1;
-    VerPantallaSegunID();
+    ListarProductos(lastLocal);
 }
 
 function getIdClientUser(){
@@ -96,7 +97,9 @@ function ListarCategoria(){
     
     var form_data = new FormData();
         form_data.append('Accion', 1);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
-                
+        form_data.append('idPantalla', idPantalla);
+        form_data.append('idClientUser', idClientUser);
+        
        $.ajax({// se arma un objecto por medio de ajax  
         url: 'Consultas/main.draw.php',// se indica donde llegara la informacion del objecto
         
@@ -125,7 +128,9 @@ function ListarLocales(Categoria=''){
     var form_data = new FormData();
         form_data.append('Accion', 2);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
         form_data.append('Categoria', Categoria);
-                
+        form_data.append('idPantalla', idPantalla);
+        form_data.append('idClientUser', idClientUser);
+        
        $.ajax({// se arma un objecto por medio de ajax  
         url: 'Consultas/main.draw.php',// se indica donde llegara la informacion del objecto
         
@@ -154,7 +159,9 @@ function DibujaLocal(idLocal=''){
     var form_data = new FormData();
         form_data.append('Accion', 3);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
         form_data.append('idLocal', idLocal);
-                
+        form_data.append('idPantalla', idPantalla);
+        form_data.append('idClientUser', idClientUser);
+        
        $.ajax({// se arma un objecto por medio de ajax  
         url: 'Consultas/main.draw.php',// se indica donde llegara la informacion del objecto
         
@@ -315,7 +322,8 @@ function VerCarrito(){
     var form_data = new FormData();
         form_data.append('Accion', 5);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
         form_data.append('idClientUser', idClientUser);
-                
+        form_data.append('idPantalla', idPantalla);
+           
        $.ajax({// se arma un objecto por medio de ajax  
         url: 'Consultas/main.draw.php',// se indica donde llegara la informacion del objecto
         
@@ -593,7 +601,7 @@ function BuscarLocal(){
 }
 
 ListarCategoria();
-var idClientUser=getIdClientUser();
+
 
 ActualizarTotalItemsCarro(idClientUser);
 
