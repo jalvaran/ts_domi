@@ -16,7 +16,7 @@
   cursor:pointer;
   z-index: 2;
   bottom: 2%;
-  left: 50%;
+  left: 44%;
   height: 50px;
   width: 50px;
   font-size:50px;
@@ -41,6 +41,30 @@
   z-index: 2;
   bottom: 2%;
   right: 2%;
+  height: 50px;
+  width: 50px;
+  font-size:50px;
+  
+}
+
+.pageNav-pageBack-icon {
+  position: fixed;
+  cursor:pointer;
+  z-index: 2;
+  bottom: 2%;
+  left: 30%;
+  height: 50px;
+  width: 50px;
+  font-size:50px;
+  
+}
+
+.pageNav-pageForward-icon {
+  position: fixed;
+  cursor:pointer;
+  z-index: 2;
+  bottom: 2%;
+  left: 60%;
   height: 50px;
   width: 50px;
   font-size:50px;

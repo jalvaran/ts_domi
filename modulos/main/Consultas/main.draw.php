@@ -52,7 +52,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $sql="SELECT * FROM inventarios_clasificacion WHERE Estado=1";
             $Consulta=$obCon->Query2($sql, HOST, USER, PW, $dbLocal, "");
             $i=1;
-            $values["values"][0]="";       $values["text"][0]="";  $values["sel"][0]=1;  
+            $values["values"][0]="";       $values["text"][0]="Todas";  $values["sel"][0]=1;  
             while ($DatosConsulta = $obCon->FetchAssoc($Consulta)) {                
                 $values["values"][$i]=$DatosConsulta["ID"];       $values["text"][$i]=$DatosConsulta["Clasificacion"];
                 $i=$i+1;
@@ -60,14 +60,14 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $css->divCardLocales($Fondo,utf8_encode($DatosLocal["Nombre"]), utf8_encode($DatosLocal["Descripcion"]), utf8_encode($DatosLocal["Telefono"]."<br>".$DatosLocal["Direccion"]), $DatosLocal["Icono"], $DatosLocal["ColorIcono"],$js,"style=cursor:pointer",12);       
             
             $style="style='width:130%;'";
-             
-            $htmlSelect=$css->getHtmlSelect("cmbClasificacion", "cmbClasificacion", $values, "Clasificacion", $js, $style);
+            $js="onchange=ListarProductos(`$idLocal`)"; 
+            $htmlSelect=$css->getHtmlSelectBootstrap("cmbClasificacion", "cmbClasificacion", $values, "Clasificacion", $js, $style);
             $Title="Clasificacion";
             $css->divForm($Title, $htmlSelect);
             
             
             
-            $html=$css->getHtmlInput("text","BusquedaProducto", "BusquedaProducto", "", "Buscar",'',$style,"search",1);
+            $html=$css->getHtmlInput("text","BusquedaProducto", "BusquedaProducto", "", "Buscar",$js,$style,"search",1);
             $css->divForm("Busqueda", $html, "", "", 6);
             print('<div id="DivProductos" class="mdc-layout-grid__cell--span-12">');
             
@@ -75,22 +75,62 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
         break;//fin caso 3
         
         case 4://lista los productos
+            $Limit=10;
             $idLocal=$obCon->normalizar($_REQUEST["idLocal"]);
+            $BusquedaProducto=$obCon->normalizar($_REQUEST["BusquedaProducto"]);
+            $cmbClasificacion=$obCon->normalizar($_REQUEST["cmbClasificacion"]);
+            $Page=$obCon->normalizar($_REQUEST["Page"]);
             if($idLocal==''){
                 exit("No se recibió un local");
             }
+            if($Page==''){
+                $Page=1;
+                $NumPage=1;
+            }
+            
+            $Condicion=" WHERE t1.Estado=1 ";
+            if($cmbClasificacion<>''){
+                $Condicion.=" AND idClasificacion='$cmbClasificacion'";
+            }
+            if($BusquedaProducto<>''){
+                $Condicion.=" AND Nombre like '%$BusquedaProducto%'";
+            }
+            
             $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
             $idClientUser=$obCon->normalizar($_REQUEST["idClientUser"]);
+            $dbLocal=$DatosLocal["db"];
+            $PuntoInicio = ($Page * $Limit) - $Limit;
+            
+            $sql = "SELECT COUNT(t1.ID) as Items 
+                   FROM productos_servicios t1 $Condicion;";
+            
+            $Consulta2=$obCon->QueryExterno($sql, HOST, USER, PW, $dbLocal, "");
+            $totales = $obCon->FetchAssoc($Consulta2);
+            $ResultadosTotales = $totales['Items'];
+            
+            if($ResultadosTotales>$Limit){
+                $TotalPaginas= ceil($ResultadosTotales/$Limit);
+                if($Page>1){
+                    $js="onclick=pageMinus();";
+                    $css->botonNavegacion($js, "green", "pageNav-pageBack-icon mdi mdi-arrow-left-bold", "PageMinus");
+                }
+                if($ResultadosTotales>($PuntoInicio+$Limit)){
+                    $js="onclick=pageAdd();";
+                    $css->botonNavegacion($js, "green", "pageNav-pageForward-icon mdi mdi-arrow-right-bold", "PageAdd");
+                }
+            }
+            
             print('<div class="page-wrapper mdc-toolbar-fixed-adjust">');
                 print('<div class="content-wrapper">');
                     print('<div class="mdc-layout-grid">');                        
                         print('<div class="mdc-layout-grid__inner">');
                             $col=4;
                             
-                            $dbLocal=$DatosLocal["db"];
+                            
                             $sql="SELECT t1.*,
                                     (SELECT t2.Ruta FROM productos_servicios_imagenes t2 WHERE t1.ID=t2.idProducto ORDER BY t1.ID ASC LIMIT 1) as RutaImagen 
-                                    FROM productos_servicios t1 WHERE t1.Estado=1";
+                                    FROM productos_servicios t1 $Condicion ORDER BY ID DESC LIMIT $PuntoInicio,$Limit;";
+                            
                             $Consulta=$obCon->Query2($sql, HOST, USER, PW, $dbLocal, "");
                             while($DatosProductos=$obCon->FetchAssoc($Consulta)){
                                 $html=$css->getHtmlInfoProducto($idClientUser, $idLocal, $DatosProductos["ID"], $DatosProductos["Nombre"], $DatosProductos["DescripcionCorta"], $DatosProductos["RutaImagen"], $DatosProductos["PrecioVenta"]);
@@ -182,11 +222,11 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 
             }
             if($TotalPedido>0){
-                $inputObservaciones=$css->getHtmlInput("textarea", "ObservacionesPedido_".$DatosPedido["ID"], "ObservacionesPedido_".$DatosPedido["ID"], "", "Observaciones Generales","");
+                $inputObservaciones=$css->getHtmlInput("textarea", "ObservacionesPedido", "ObservacionesPedido", "", "Observaciones Generales","");
                 
                 $inputNombre=$css->getHtmlInput("text", "NombreCliente", "NombreCliente", "", "Nombre","","","input",1);
                 $inputDireccion=$css->getHtmlInput("text", "DireccionCliente", "DireccionCliente", "", "Direccion","","","home",1);
-                $inputTelefono=$css->getHtmlInput("text", "Telefono", "Telefono", "", "Telefono","","","telephone",1);
+                $inputTelefono=$css->getHtmlInput("number", "Telefono", "Telefono", "", "Telefono","","","telephone",1);
                 $htmInputs="<br>".$inputNombre."<br>".$inputDireccion."<br>".$inputTelefono."<br>".$inputObservaciones;
                 $htmlBotonCancelar=$css->getHtmlBoton(2, "btnDescartarPedido", "btnDescartarPedido", "Descartar", "onclick=ConfimarDescartarPedidos(`$idClientUser`)", "width:100px;");
                 $htmlBotonConfirmar=$css->getHtmlBoton(1, "btnGuardarPedido", "btnGuardarPedido", "Solicitar", "onclick=ConfimarSolicitarPedidos(`$idClientUser`)", "width:100px;");
@@ -219,6 +259,24 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 $css->CrearTitulo("<strong>Tu Cesta está vacía!<strong>",4);
             }
         break;//Fin caso 5    
+        
+        case 6://dibuja el listado de los locales de acuerdo a la busqueda
+            $Busqueda=$obCon->normalizar($_REQUEST["Busqueda"]);
+            $sql="SELECT * FROM locales WHERE Nombre LIKE '%$Busqueda%' AND Estado=1 ORDER BY Orden ASC LIMIT 50";
+            $Consulta=$obCon->Query($sql);
+            while($DatosCategorias=$obCon->FetchAssoc($Consulta)){
+                $idItem=$DatosCategorias["ID"];
+                $js="onclick=DibujaLocal(`$idItem`)";
+                $Fondo="../../images/image.webp";
+                $DatosFondo=$obCon->DevuelveValores("locales_imagenes", "idLocal", $idItem);
+                if($DatosFondo["ID"]<>''){
+                    $Fondo=$DatosFondo["Ruta"];
+                }
+                $css->divCardLocales($Fondo,utf8_encode($DatosCategorias["Nombre"]), utf8_encode($DatosCategorias["Descripcion"]), utf8_encode($DatosCategorias["Telefono"]."<br>".$DatosCategorias["Direccion"]), $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
+
+            }
+            
+        break;//fin caso 6
         
  }
     

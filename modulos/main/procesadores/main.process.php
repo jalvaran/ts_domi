@@ -143,7 +143,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $idUserClient=$obCon->normalizar($_REQUEST["idUserClient"]);  
             $NombreCliente=$obCon->normalizar($_REQUEST["NombreCliente"]);  
             $DireccionCliente=$obCon->normalizar($_REQUEST["DireccionCliente"]);  
-            $Telefono=$obCon->normalizar($_REQUEST["Telefono"]);  
+            $Telefono=$obCon->normalizar($_REQUEST["Telefono"]); 
+            $ObservacionesPedido=$obCon->normalizar($_REQUEST["ObservacionesPedido"]); 
             
             if($idUserClient==""){
                 exit("E1;No se recibió el id del cliente");
@@ -160,7 +161,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $obCon->ActualiceDatosCliente($idUserClient, $NombreCliente, $DireccionCliente, $Telefono);
             
-            $sql="UPDATE pedidos SET Estado=2 WHERE cliente_id='$idUserClient' AND Estado=1";
+            $sql="UPDATE pedidos SET Estado=2,Observaciones='$ObservacionesPedido' WHERE cliente_id='$idUserClient' AND Estado=1";
             $obCon->Query($sql);
             
             print("OK;Tu Pedido ha sido Solicitado");

@@ -111,11 +111,11 @@ class PageConstruct extends html_estruct_class{
             <span class="mdc-top-app-bar__title">'.$Titulo.'</span>
             <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon search-text-field  d-md-flex">
               <i class="material-icons mdc-text-field__icon">b</i>
-              <input class="mdc-text-field__input" id="text-field-hero-input">
+              <input class="mdc-text-field__input" id="BusquedaLocal" onchange=BuscarLocal()>
               <div class="mdc-notched-outline">
                 <div class="mdc-notched-outline__leading"></div>
                 <div class="mdc-notched-outline__notch">
-                  <label for="text-field-hero-input" class="mdc-floating-label">Buscar..</label>
+                  <label for="text-field-hero-input" class="mdc-floating-label">Buscar Local..</label>
                 </div>
                 <div class="mdc-notched-outline__trailing"></div>
               </div>
@@ -313,12 +313,12 @@ class PageConstruct extends html_estruct_class{
     }
     
     public function getHtmlSelect($id,$name,$values,$placeholder,$js,$style) {
-        $html='<div class="mdc-select demo-width-class" data-mdc-auto-init="MDCSelect" '.$style.'>
+        $html='<div class="mdc-select demo-width-class" data-mdc-auto-init="MDCSelect" '.$style.' >
                       <input id="'.$id.'" type="hidden" name="'.$name.'" '.$js.'>
-                      <i class="mdc-select__dropdown-icon"></i>
-                      <div class="mdc-select__selected-text"></div>
+                      <i class="mdc-select__dropdown-icon" ></i>
+                      <div class="mdc-select__selected-text" ></div>
                       <div class="mdc-select__menu mdc-menu-surface demo-width-class">
-                        <ul class="mdc-list">';
+                        <ul class="mdc-list" >';
         foreach ($values["values"] as $key => $value){
             $sel="false";
             $selected="";
@@ -336,6 +336,25 @@ class PageConstruct extends html_estruct_class{
                       <div class="mdc-line-ripple"></div>
                     </div>
                   </div>';
+        return($html);
+    }
+    
+    public function getHtmlSelectBootstrap($id,$name,$values,$placeholder,$js,$style) {
+        $html='
+                      <select id="'.$id.'" name="'.$name.'" class="form-control" '.$js.' '.$style.'>
+                      ';
+        foreach ($values["values"] as $key => $value){
+            $sel="false";
+            $selected="";
+            if(isset($values["sel"][$key])){
+                $sel="true";
+                $selected="selected";
+            }
+            $html.='<option value="'.$value.'" '.$selected.'">';
+                $html.= ($values["text"][$key]);
+            $html.='</option>';
+        }
+        $html.='</select>';
         return($html);
     }
     

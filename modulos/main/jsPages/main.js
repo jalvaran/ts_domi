@@ -7,7 +7,9 @@
 var idPantalla=1;
 var lastLocal=1;
 var lastCategory=1;
+var Page=1;
 function VerPantallaSegunID(){
+    
     if(idPantalla==1){
         ListarCategoria();
     }
@@ -17,27 +19,38 @@ function VerPantallaSegunID(){
     if(idPantalla==3){
         DibujaLocal(lastLocal);
     }
+    
     if(idPantalla==4){
-        ListarProductos(lastLocal);
-    }
-    if(idPantalla==5){
         VerCarrito();
     }
 }
 
 function ListarAnterior(){
     if(idPantalla>1){
-        idPantalla=idPantalla-1;
+        idPantalla=parseInt(idPantalla)-1;
     }
     VerPantallaSegunID();
 }
 
 function ListarSiguiente(){
-    if(idPantalla<5){
+    if(idPantalla<4){
         idPantalla=parseInt(idPantalla)+1;
     }
     VerPantallaSegunID();
 }
+
+function pageMinus(){
+    if(Page>1){
+        Page=parseInt(Page)-1;
+    }
+    VerPantallaSegunID();
+}
+
+function pageAdd(){
+    Page=parseInt(Page)+1;
+    VerPantallaSegunID();
+}
+
 function getIdClientUser(){
     var idClientUser = Cookies.get('idClientUser');    
     if(idClientUser==undefined){        
@@ -166,15 +179,18 @@ function DibujaLocal(idLocal=''){
 
 
 function ListarProductos(idLocal=''){
-    idPantalla=4;
-    lastLocal=idLocal;
+    
     var idDiv="DivProductos";
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
-    
+    var cmbClasificacion = document.getElementById('cmbClasificacion').value;
+    var BusquedaProducto = document.getElementById('BusquedaProducto').value;
     var form_data = new FormData();
         form_data.append('Accion', 4);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
         form_data.append('idLocal', idLocal);
         form_data.append('idClientUser', idClientUser);
+        form_data.append('cmbClasificacion', cmbClasificacion);
+        form_data.append('BusquedaProducto', BusquedaProducto);
+        form_data.append('Page', Page);
                 
        $.ajax({// se arma un objecto por medio de ajax  
         url: 'Consultas/main.draw.php',// se indica donde llegara la informacion del objecto
@@ -291,7 +307,7 @@ function ActualizarTotalItemsCarro(user_id){
 }
     
 function VerCarrito(){
-    idPantalla=5;
+    idPantalla=4;
     
     var idDiv="divMain";
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
@@ -452,12 +468,14 @@ function CrearPedido(idUserClient){
     var NombreCliente=document.getElementById('NombreCliente').value;
     var DireccionCliente=document.getElementById('DireccionCliente').value;
     var Telefono=document.getElementById('Telefono').value;
+    var ObservacionesPedido=document.getElementById('ObservacionesPedido').value;
     
     var form_data = new FormData();
         form_data.append('Accion', '5'); 
         form_data.append('NombreCliente', NombreCliente);
         form_data.append('DireccionCliente', DireccionCliente);
         form_data.append('Telefono', Telefono);
+        form_data.append('ObservacionesPedido', ObservacionesPedido);
         form_data.append('idUserClient', idUserClient);
                         
         $.ajax({
@@ -538,6 +556,36 @@ function DescartarPedidos(idUserClient){
         },
         error: function (xhr, ajaxOptions, thrownError) {
             
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function BuscarLocal(){
+    idPantalla=2;
+    var Busqueda=document.getElementById('BusquedaLocal').value;
+    var idDiv="divMain";
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 6);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        form_data.append('Busqueda', Busqueda);
+                
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/main.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+             },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            document.getElementById(idDiv).innerHTML="hay un problema!";
             alert(xhr.status);
             alert(thrownError);
           }
