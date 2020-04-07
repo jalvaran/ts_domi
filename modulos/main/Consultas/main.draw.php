@@ -19,7 +19,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             while($DatosCategorias=$obCon->FetchAssoc($Consulta)){
                 $idItem=$DatosCategorias["ID"];
                 $js="onclick=ListarLocales(`$idItem`)";
-                $css->divCard("",utf8_encode($DatosCategorias["Nombre"]), utf8_encode($DatosCategorias["Descripcion"]), "", $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
+                $css->divCard("",($DatosCategorias["Nombre"]), ($DatosCategorias["Descripcion"]), "", $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
 
             }
             
@@ -40,7 +40,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 if($DatosFondo["ID"]<>''){
                     $Fondo=$DatosFondo["Ruta"];
                 }
-                $css->divCardLocales($Fondo,utf8_encode($DatosCategorias["Nombre"]), utf8_encode($DatosCategorias["Descripcion"]), utf8_encode($DatosCategorias["Telefono"]."<br>".$DatosCategorias["Direccion"]), $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
+                $css->divCardLocales($Fondo,($DatosCategorias["Nombre"]), ($DatosCategorias["Descripcion"]), ($DatosCategorias["Telefono"]."<br>".$DatosCategorias["Direccion"]), $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
 
             }
             
@@ -65,7 +65,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 $values["values"][$i]=$DatosConsulta["ID"];       $values["text"][$i]=$DatosConsulta["Clasificacion"];
                 $i=$i+1;
             }
-            $css->divCardLocales($Fondo,utf8_encode($DatosLocal["Nombre"]), utf8_encode($DatosLocal["Descripcion"]), utf8_encode($DatosLocal["Telefono"]."<br>".$DatosLocal["Direccion"]), $DatosLocal["Icono"], $DatosLocal["ColorIcono"],$js,"style=cursor:pointer",12);       
+            $css->divCardLocales($Fondo,($DatosLocal["Nombre"]), ($DatosLocal["Descripcion"]), ($DatosLocal["Telefono"]."<br>".$DatosLocal["Direccion"]), $DatosLocal["Icono"], $DatosLocal["ColorIcono"],$js,"style=cursor:pointer",12);       
             
             $style="style='width:130%;'";
             $js="onchange=ListarProductos(`$idLocal`)"; 
@@ -78,17 +78,18 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $html=$css->getHtmlInput("text","BusquedaProducto", "BusquedaProducto", "", "Buscar",$js,$style,"search",1);
             $css->divForm("Busqueda", $html, "", "", 6);
             
-            $idCliente=$obCon->normalizar($_REQUEST["idClientUser"]);
-            $idPantalla=$obCon->normalizar($_REQUEST["idPantalla"]); 
-            $obCon->logVisit($idCliente, $idPantalla, $idLocal, $ipUser);
-            
+            if(isset($_REQUEST["idClientUser"]) and isset($_REQUEST["idPantalla"])){
+                $idCliente=$obCon->normalizar($_REQUEST["idClientUser"]);
+                $idPantalla=$obCon->normalizar($_REQUEST["idPantalla"]); 
+                $obCon->logVisit($idCliente, $idPantalla, $idLocal, $ipUser);
+            }
             print('<div id="DivProductos" class="mdc-layout-grid__cell--span-12">');
             
             $css->Cdiv();
         break;//fin caso 3
         
         case 4://lista los productos
-            $Limit=1;
+            $Limit=20;
             $idLocal=$obCon->normalizar($_REQUEST["idLocal"]);
             $BusquedaProducto=$obCon->normalizar($_REQUEST["BusquedaProducto"]);
             $cmbClasificacion=$obCon->normalizar($_REQUEST["cmbClasificacion"]);
@@ -228,7 +229,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                     
                     $idTextObservaciones="Observaciones_".$idItem; 
                     $htmlObservaciones=$css->getHtmlInput("textarea","Observaciones_".$idItem, "Observaciones", $DatosItems["Observaciones"], "Observaciones",'',"onchange=EditarCampoItems(`1`,`$idLocal`,`$idTextObservaciones`,`Observaciones`,`$idItem`)","",1);
-                    $css->divCard($idCardItem,utf8_encode($DatosItems["Nombre"]), ($htmlBody), $htmlObservaciones, "mdi mdi-playlist-remove", "danger","","",$jsIcon,"style=cursor:pointer");       
+                    $css->divCard($idCardItem,($DatosItems["Nombre"]), ($htmlBody), $htmlObservaciones, "mdi mdi-playlist-remove", "danger","","",$jsIcon,"style=cursor:pointer");       
 
                 }
                 
@@ -272,9 +273,11 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 $css->CrearTitulo("<strong>Tu Cesta está vacía!<strong>",4);
             }
             
-            $idCliente=$obCon->normalizar($_REQUEST["idClientUser"]);
-            $idPantalla=$obCon->normalizar($_REQUEST["idPantalla"]); 
-            $obCon->logVisit($idCliente, $idPantalla, 0, $ipUser);
+            if(isset($_REQUEST["idClientUser"]) and isset($_REQUEST["idPantalla"])){
+                $idCliente=$obCon->normalizar($_REQUEST["idClientUser"]);
+                $idPantalla=$obCon->normalizar($_REQUEST["idPantalla"]); 
+                $obCon->logVisit($idCliente, $idPantalla, 0, $ipUser);
+            }
             
         break;//Fin caso 5    
         
@@ -290,7 +293,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 if($DatosFondo["ID"]<>''){
                     $Fondo=$DatosFondo["Ruta"];
                 }
-                $css->divCardLocales($Fondo,utf8_encode($DatosCategorias["Nombre"]), utf8_encode($DatosCategorias["Descripcion"]), utf8_encode($DatosCategorias["Telefono"]."<br>".$DatosCategorias["Direccion"]), $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
+                $css->divCardLocales($Fondo,($DatosCategorias["Nombre"]), ($DatosCategorias["Descripcion"]), ($DatosCategorias["Telefono"]."<br>".$DatosCategorias["Direccion"]), $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
 
             }
             

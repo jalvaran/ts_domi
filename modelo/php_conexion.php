@@ -360,14 +360,19 @@ class conexion extends db_conexion{
     }
     
     public function logVisit($client_user_id,$idPantalla,$idLocal,$IP) {
-        $tab="log_visits";
-        $Datos["client_user_id"]=$client_user_id;
-        $Datos["idPantalla"]=$idPantalla;
-        $Datos["idLocal"]=$idLocal;
-        $Datos["IP"]=$IP;
-        $Datos["Created"]=date("Y-m-d H:i:s");
-        $sql= $this->getSQLInsert($tab, $Datos);
-        $this->Query($sql);
+        if($client_user_id<>''){
+            
+       
+            $tab="log_visits";
+            $Datos["client_user_id"]=$client_user_id;
+            $Datos["idPantalla"]=$idPantalla;
+            $Datos["idLocal"]=$idLocal;
+            $Datos["IP"]=$IP;
+            $Datos["Created"]=date("Y-m-d H:i:s");
+            $sql= $this->getSQLInsert($tab, $Datos);
+            $this->Query($sql);
+         }
+        
     }
 }
 ?>
