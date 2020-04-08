@@ -25,6 +25,7 @@ $css->PageInit($myTitulo);
     
 $css->PageEnd();
 
+print('<script src="jsPages/admin.js"></script>');  //script propio de la pagina
 print('<script src="jsPages/main.js"></script>');  //script propio de la pagina
 
 $css->Cbody();

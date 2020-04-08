@@ -68,7 +68,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $css->divCardLocales($Fondo,($DatosLocal["Nombre"]), ($DatosLocal["Descripcion"]), ($DatosLocal["Telefono"]."<br>".$DatosLocal["Direccion"]), $DatosLocal["Icono"], $DatosLocal["ColorIcono"],$js,"style=cursor:pointer",12);       
             
             $style="style='width:130%;'";
-            $js="onchange=ListarProductos(`$idLocal`)"; 
+            $js="onchange=ListarProductos(`$idLocal`);Page=1;"; 
             $htmlSelect=$css->getHtmlSelectBootstrap("cmbClasificacion", "cmbClasificacion", $values, "Clasificacion", $js, $style);
             $Title="Clasificacion";
             $css->divForm($Title, $htmlSelect);
@@ -298,6 +298,50 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             }
             
         break;//fin caso 6
+        
+        case 7://formulario para iniciar sesion
+            
+            print('
+              <div class="stretch-card mdc-layout-grid__cell--span-4-desktop mdc-layout-grid__cell--span-1-tablet"></div>
+              <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-4-desktop mdc-layout-grid__cell--span-6-tablet">
+                <div class="mdc-card">
+                  <form>
+                    <div class="mdc-layout-grid">
+                      <div class="mdc-layout-grid__inner">
+                        <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+                          <div class="mdc-text-field w-100 mdc-ripple-upgraded" style="--mdc-ripple-fg-size:209px; --mdc-ripple-fg-scale:1.7296289512582848; --mdc-ripple-fg-translate-start:15.83331298828125px, -84.5px; --mdc-ripple-fg-translate-end:69.79998779296875px, -82px;">
+                            <input class="mdc-text-field__input" id="user_domi">
+                            <div class="mdc-line-ripple" style="transform-origin: 120.333px center 0px;"></div>
+                            <label for="text-field-hero-input" class="mdc-floating-label">Usuario</label>
+                          </div>
+                        </div>
+                        <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+                          <div class="mdc-text-field w-100 mdc-ripple-upgraded" style="--mdc-ripple-fg-size:209px; --mdc-ripple-fg-scale:1.7296289512582848; --mdc-ripple-fg-translate-start:56.83331298828125px, -83.5px; --mdc-ripple-fg-translate-end:69.79998779296875px, -82px;">
+                            <input class="mdc-text-field__input" type="password" id="pw_domi">
+                            <div class="mdc-line-ripple" style="transform-origin: 161.333px center 0px;"></div>
+                            <label for="text-field-hero-input" class="mdc-floating-label">Password</label>
+                          </div>
+                        </div>
+                        <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-6-desktop">
+                          
+                        </div>
+                        <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-6-desktop d-flex align-items-center justify-content-end">
+                          
+                        </div>
+                        <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+                          <a href="#" class="mdc-button mdc-button--raised w-100 mdc-ripple-upgraded" onclick=ValidarLogin();>
+                            Entrar
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <div class="stretch-card mdc-layout-grid__cell--span-4-desktop mdc-layout-grid__cell--span-1-tablet"></div>
+            ');
+            
+        break;//Fin caso 7    
         
  }
     

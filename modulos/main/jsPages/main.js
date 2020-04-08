@@ -151,6 +151,7 @@ function ListarLocales(Categoria=''){
 }
 
 function DibujaLocal(idLocal=''){
+    Page=1;
     idPantalla=3;
     lastLocal=idLocal;
     var idDiv="divMain";

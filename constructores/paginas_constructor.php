@@ -82,8 +82,8 @@ class PageConstruct extends html_estruct_class{
     
     public function MenuLateral($Nombre,$Ruta,$js) {
         print('<div class="mdc-list-item mdc-drawer-item">
-                <a class="mdc-drawer-link" href="'.$Ruta.'" '.$js.'>
-                  <i class="material-icons mdc-list-item__start-detail mdc-drawer-item-icon" aria-hidden="true">home</i>
+                <a class="mdc-drawer-link" '.$js.'>
+                  <i class="material-icons mdc-list-item__start-detail mdi mdi-login-variant" aria-hidden="true"> </i>
                   '.$Nombre.'
                 </a>
               </div>');
@@ -94,7 +94,7 @@ class PageConstruct extends html_estruct_class{
                   <div class="profile-actions">
 
                     <span class="divider"></span>
-                    <a href="javascript:;">Logout</a>
+                    <a href="#" onclick=TerminarSesion();>Salir</a>
                   </div>
 
                 </div>
@@ -178,7 +178,7 @@ class PageConstruct extends html_estruct_class{
         //$NombreUsuario= utf8_encode($_SESSION["nombre"]);
         //$idUser=$_SESSION["idUser"];
         $this->BarraLateralIni($myTitulo,"",""); 
-            $this->MenuLateral("Inicio", "index.php", "");
+            $this->MenuLateral(" Administrar ", "index.php", "onclick=FormularioIniciarSesion();");
         $this->BarraLateralFin();    
         $this->MainWraper();
             $this->Cabecera($myTitulo);
@@ -402,14 +402,34 @@ class PageConstruct extends html_estruct_class{
     
     public function getHtmlBoton($type,$id,$name,$value,$js,$moreStyles="") {
         $moreClass="";
+        $Color="";
         if($type==1){
             $Color="--mdc-ripple-fg-size:57px; --mdc-ripple-fg-scale:1.9678808653005644; --mdc-ripple-fg-translate-start:27.5px, -8.5px; --mdc-ripple-fg-translate-end:19.308334350585938px, -10.5px";
             
         }
         if($type==2){
             $Color="--mdc-ripple-fg-size:65px; --mdc-ripple-fg-scale:1.9291179361344377; --mdc-ripple-fg-translate-start:39.5px, -22.5px; --mdc-ripple-fg-translate-end:22.316665649414062px, -14.5px;";
-            $moreClass="filled-button--secondary";
-            
+            $moreClass="filled-button--secondary";            
+        }
+        if($type==3){
+            $Color="--mdc-ripple-fg-size:65px; --mdc-ripple-fg-scale:1.9291179361344377; --mdc-ripple-fg-translate-start:39.5px, -22.5px; --mdc-ripple-fg-translate-end:22.316665649414062px, -14.5px;";
+            $moreClass="filled-button--success";            
+        }
+        if($type==4){
+            $Color="--mdc-ripple-fg-size:65px; --mdc-ripple-fg-scale:1.9291179361344377; --mdc-ripple-fg-translate-start:39.5px, -22.5px; --mdc-ripple-fg-translate-end:22.316665649414062px, -14.5px;";
+            $moreClass="filled-button--warning";            
+        }
+        if($type==5){
+            $Color="--mdc-ripple-fg-size:65px; --mdc-ripple-fg-scale:1.9291179361344377; --mdc-ripple-fg-translate-start:39.5px, -22.5px; --mdc-ripple-fg-translate-end:22.316665649414062px, -14.5px;";
+            $moreClass="filled-button--dark";            
+        }
+        if($type==6){
+            $Color="--mdc-ripple-fg-size:65px; --mdc-ripple-fg-scale:1.9291179361344377; --mdc-ripple-fg-translate-start:39.5px, -22.5px; --mdc-ripple-fg-translate-end:22.316665649414062px, -14.5px;";
+            $moreClass="filled-button--info";            
+        }
+        if($type==7){
+            $Color="--mdc-ripple-fg-size:65px; --mdc-ripple-fg-scale:1.9291179361344377; --mdc-ripple-fg-translate-start:39.5px, -22.5px; --mdc-ripple-fg-translate-end:22.316665649414062px, -14.5px;";
+            $moreClass="filled-button--light";            
         }
         $html='<button id="'.$id.'" name="'.$name.'"  '.$js.' class="mdc-button mdc-button--raised '.$moreClass.' mdc-ripple-upgraded" style="'.$Color.';width:100%;'.$moreStyles.'">
                 '.$value.'
@@ -530,10 +550,10 @@ class PageConstruct extends html_estruct_class{
         
     }
     
-    function getHtmlTable($Titulo,$Columnas,$Filas){
+    function getHtmlTable($Titulo,$Columnas,$Filas,$Acciones=""){
         $html='<div class="mdc-card p-0">
                   <h6 class="card-title card-padding pb-0">'.$Titulo.'</h6>
-                  <div class="table">
+                  <div class="table-responsive">
                     <table class="table table-striped">
                       <thead>
                         <tr>';
@@ -546,15 +566,31 @@ class PageConstruct extends html_estruct_class{
                 </thead>
                       <tbody>
                 ';
-        foreach ($Filas as $DatosItems) {
-            $html.='<tr>';
-            foreach ($DatosItems as $key => $value) {
+        if(is_array($Filas[0])){
+            foreach ($Filas as $DatosItems) {
+                $html.='<tr >';
+                foreach ($DatosItems as $key => $value) {
+                    if(isset($Acciones[$key]["Visible"]) AND $Acciones[$key]["Visible"]==0){
+                        continue;
+                    }
+                    if(isset($Acciones[$key]["js"])){
+                        $jsIcon= str_replace("%value", $value, $Acciones[$key]["js"]);
+                        $html.='<td class="text-left"><span class="'.$Acciones[$key]["icon"].'" '.$Acciones[$key]["style"].' '.$jsIcon.'></span></td>';
+                    }
+                    if(isset($Acciones[$key]["html"])){
+                        $htmlCol= str_replace("@value", $value, $Acciones[$key]["html"]);
+                        $htmlCol= str_replace("@ID", $DatosItems["ID"], $htmlCol);
+                        $html.='<td class="text-left">'.$htmlCol.'</td>';
+                    }
+                    $html.='<td class="text-left">'.$value.'</td>';
+                    
+                    
+                   
 
-                $html.='<td>'.$value.'</td>';
-                        
-                        
+
+                }
+                $html.='</tr>';
             }
-            $html.='</tr>';
         }
         $html.='</tbody>
                     </table>
