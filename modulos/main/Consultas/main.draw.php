@@ -240,7 +240,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 
                 $inputNombre=$css->getHtmlInput("text", "NombreCliente", "NombreCliente", "", "Nombre","","","input",1);
                 $inputDireccion=$css->getHtmlInput("text", "DireccionCliente", "DireccionCliente", "", "Direccion","","","home",1);
-                $inputTelefono=$css->getHtmlInput("number", "Telefono", "Telefono", "", "Telefono","","","telephone",1);
+                $inputTelefono=$css->getHtmlInput("text", "Telefono", "Telefono", "", "Telefono","","","telephone",1);
                 $htmInputs="<br>".$inputNombre."<br>".$inputDireccion."<br>".$inputTelefono."<br>".$inputObservaciones;
                 $htmlBotonCancelar=$css->getHtmlBoton(2, "btnDescartarPedido", "btnDescartarPedido", "Descartar", "onclick=ConfimarDescartarPedidos(`$idClientUser`)", "width:100px;");
                 $htmlBotonConfirmar=$css->getHtmlBoton(1, "btnGuardarPedido", "btnGuardarPedido", "Solicitar", "onclick=ConfimarSolicitarPedidos(`$idClientUser`)", "width:100px;");

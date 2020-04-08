@@ -2,7 +2,6 @@
 if(isset($_REQUEST["idDocumento"])){
     $myPage="PDF_Documentos.draw.php";
     include_once("../../modelo/php_conexion.php");
-    //include_once("../../modelo/PrintPos.php");
     include_once("../clases/ClasesPDFDocumentos.class.php");
     
     $obCon = new conexion(1);

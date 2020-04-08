@@ -2,10 +2,14 @@
 
 include_once("../clases/main.class.php");
 
+if(file_exists("../../../general/clases/mail.class.php")){
+    include_once("../../../general/clases/mail.class.php");
+}
+
 if( !empty($_REQUEST["Accion"]) ){
     
     $obCon=new Domi(1);
-    
+    $obMail=new TS_Mail(1);
     switch ($_REQUEST["Accion"]) {
         
         case 1: //Agregar Item a un pedido
@@ -160,11 +164,83 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             
             $obCon->ActualiceDatosCliente($idUserClient, $NombreCliente, $DireccionCliente, $Telefono);
+            $sql="SELECT t1.Created,t1.ID,t1.local_id,t2.Email,t2.Nombre FROM pedidos t1 INNER JOIN locales t2 ON t1.local_id=t2.ID
+                     WHERE cliente_id='$idUserClient' AND t1.Estado=1";
+            $Consulta=$obCon->Query($sql);
+            $MailReport[]="";
+            $htmlMensaje="";
+            $Ruta=$obCon->DevuelveValores("configuracion_general", "ID", 2003);//Ruta del pdf para ver el pedido
             
+            $htmlMensaje='<div><h2><strong>Tienes nuevos Pedidos de la Plataforma DoMi!</strong></h2></div>';
+            $htmlMensaje.='<table><tr><th><strong>LISTA DE PEDIDOS:</strong></th></tr>';
+            $htmlMensaje.='<tr>
+                                <th><strong>ID</strong></th>
+                                <th><strong>Fecha</strong></th>
+                                <th><strong>Local</strong></th>
+                                <th><strong>PDF</strong></th>
+                            </tr>';
+            $i=0;
+            while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
+                $Link=$Ruta["Valor"].$DatosConsulta["ID"];
+                if($DatosConsulta["Email"]<>''){
+                    $MailReport["Email"][$i]=$DatosConsulta["Email"];
+                    $MailReport["Asunto"][$i]="PEDIDO DOMI ".$DatosConsulta["ID"];
+                    
+                    $htmlReport='<div><h2><strong>Tienes nuevos Pedidos de la Plataforma DoMi!</strong></h2></div>';
+                    $htmlReport.='<table><tr><th><strong>LISTA DE PEDIDOS:</strong></th></tr>';
+                    $htmlReport.='<tr>
+                                        <th><strong>ID</strong></th>
+                                        <th><strong>Fecha</strong></th>
+                                        <th><strong>Local</strong></th>
+                                        <th><strong>PDF</strong></th>
+                                    </tr>';
+                    $htmlReport.='<tr>
+                                <th>'.$DatosConsulta["ID"].'</th>
+                                <th>'.$DatosConsulta["Created"].'</th>
+                                <th>'.$DatosConsulta["Nombre"].'</th>
+                                <th><a href="'.$Link.'" target="_blank">VER PDF</th>
+                            </tr>';
+                    $htmlReport.="</table>";
+                    
+                    $MailReport["Html"][$i]=$htmlReport;
+                }
+                
+                $htmlMensaje.='<tr>
+                                <th>'.$DatosConsulta["ID"].'</th>
+                                <th>'.$DatosConsulta["Created"].'</th>
+                                <th>'.$DatosConsulta["Nombre"].'</th>
+                                <th><a href="'.$Link.'" target="_blank">VER PDF</th>
+                            </tr>';
+                
+                $i=$i+1;
+            }
+            $htmlMensaje.="</table>";
             $sql="UPDATE pedidos SET Estado=2,Observaciones='$ObservacionesPedido' WHERE cliente_id='$idUserClient' AND Estado=1";
             $obCon->Query($sql);
             
-            print("OK;Tu Pedido ha sido Solicitado");
+            $Validacion=$obCon->DevuelveValores("configuracion_general", "ID", 2002);//Determina si se envia correo de notificacion
+            
+            if($Validacion["Valor"]==1){
+                $ValidacionMetodoEnvio=$obCon->DevuelveValores("configuracion_general", "ID", 25);//Determina el metodo de envio
+                if($ValidacionMetodoEnvio["Valor"]==1){
+                    if(isset($MailReport["Email"])){
+                        foreach ($MailReport["Email"] as $key => $value) {
+                            $obMail->EnviarMailXPHPNativo($value, "technosoluciones.domi@gmail.com", "PLATAFORMA DOMI", $MailReport["Asunto"][$key], $MailReport["Html"][$key]);
+                        }
+                    }
+                    
+                }else{
+                    if(isset($MailReport["Email"])){
+                        foreach ($MailReport["Email"] as $key => $value) {
+                            $obMail->EnviarMailXPHPMailer($value, "technosoluciones.domi@gmail.com", "PLATAFORMA DOMI", $MailReport["Asunto"][$key], $MailReport["Html"][$key]);
+                        }
+                    }
+                    
+                }
+                
+                
+            }
+            print("OK;$htmlMensaje");
         break;//Fin caso 5   
         
         case 6://Descartar pedido
