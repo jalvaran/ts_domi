@@ -348,7 +348,7 @@ class PageConstruct extends html_estruct_class{
             $selected="";
             if(isset($values["sel"][$key])){
                 $sel="true";
-                $selected="selected";
+                $selected=" selected = $sel ";
             }
             $html.='<option value="'.$value.'" '.$selected.'">';
                 $html.= ($values["text"][$key]);
@@ -386,7 +386,7 @@ class PageConstruct extends html_estruct_class{
         if($type=="textarea"){
             
             $html='
-                   <textarea id="'.$id.'" name="'.$name.'" class="form-control" placeholder="'.$placeholder.'" '.$style.'>'.$value.'</textarea>';
+                   <textarea id="'.$id.'" name="'.$name.'" class="form-control" placeholder="'.$placeholder.'" '.$disabled.' '.$style.'>'.$value.'</textarea>';
         }
         
         return($html);
@@ -574,7 +574,7 @@ class PageConstruct extends html_estruct_class{
                         continue;
                     }
                     if(isset($Acciones[$key]["js"])){
-                        $jsIcon= str_replace("%value", $value, $Acciones[$key]["js"]);
+                        $jsIcon= str_replace("@value", $value, $Acciones[$key]["js"]);
                         $html.='<td class="text-left"><span class="'.$Acciones[$key]["icon"].'" '.$Acciones[$key]["style"].' '.$jsIcon.'></span></td>';
                     }
                     if(isset($Acciones[$key]["html"])){
@@ -631,6 +631,81 @@ class PageConstruct extends html_estruct_class{
             '.$Titulo.'
           </div>');
     }
+    
+    public function CrearTabla($id="",$type=1){
+            $class="table table-bordered table table-hover";
+            if($type==2){
+                $class="table table-striped";
+            }
+            if($type==3){
+                $class="table table-bordered";
+            }
+            if($id<>''){
+                $id="id=".$id;
+            }
+            return('<div  class="table-responsive"><table '.$id.'  class="'.$class.'" >');		
+	}
+    
+        public function HeadTable() {
+            return('<thead>');
+        }
+        public function CheadTable() {
+            return('</thead>');
+        }
+        
+        /**
+         * Fila tabla
+         * @param type $FontSize
+         */
+	function FilaTabla($FontSize,$styles=''){
+            
+            
+            return('<tr class="odd gradeX" style="font-size:'.$FontSize.'px;'.$styles.'">');
+		
+	}
+	/**
+         * Cierra una Fila de una tabla
+         */
+	function CierraFilaTabla(){
+            return('</tr>');
+		
+	}
+	
+	/**
+         * Columna de una tabla
+         * @param type $Contenido
+         * @param type $ColSpan
+         * @param type $align-> alineacion: L izquierda, R Derecha, C centro
+         */
+	function ColTabla($Contenido,$ColSpan,$align="L",$moreStyles="",$th=0){
+            $Etiqueta="td";
+            if($th==1){
+                $Etiqueta="th";
+            }
+            if($align=="L"){
+              $align="left";  
+            }
+            if($align=="R"){
+              $align="right";  
+            }
+            if($align=="C"){
+              $align="center";  
+            }
+            return('<'.$Etiqueta.' colspan="'.$ColSpan.' " style="text-align:'.$align.';'.$moreStyles.'"   >'.$Contenido.'</'.$Etiqueta.'>');
+		
+	}
+	/**
+         * Cierre columna de tabla
+         */
+	function CierraColTabla(){
+            return('</td>');		
+	}
+	/**
+         * Cierra la tabla
+         */
+	function CerrarTabla(){
+            return('</table></div>');		
+	}
     
    //Fin Clases
 }

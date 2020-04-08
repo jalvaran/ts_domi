@@ -20,21 +20,21 @@ class Admin extends conexion{
         }
         return($DatosSesion);
     }
-    
-    public function CrearUsuarioCliente($user_id,$Nombre,$Direccion,$Telefono) {
-        $Validacion= $this->DevuelveValores("client_user", "ID", $user_id);
-        if($Validacion['ID']<>''){
-            return;
-        }
-        $tab="client_user";
         
-        $Datos["ID"]=$user_id;	
-        $Datos["Nombre"]=$Nombre;	
-        $Datos["Direccion"]=$Direccion;           
-        $Datos["Telefono"]=$Telefono;		
+    public function RegistreImagenProducto($DataBase,$idProducto,$destino,$Tamano, $NombreArchivo, $Extension, $idUser) {
+        
+        $tab="productos_servicios_imagenes";
+        
+        $Datos["idProducto"]=$idProducto;
+        
+        $Datos["Ruta"]=$destino;    
+        $Datos["NombreArchivo"]=$NombreArchivo;    
+        $Datos["Extension"]=$Extension;    
+        $Datos["Tamano"]=$Tamano; 
+        $Datos["idUser"]=$idUser;		
         $Datos["Created"]=date("Y-m-d H:i:s");	
         $sql=$this->getSQLInsert($tab, $Datos);
-        $this->Query($sql);
+        $this->QueryExterno($sql, HOST, USER, PW, $DataBase, "");
     }
     
     

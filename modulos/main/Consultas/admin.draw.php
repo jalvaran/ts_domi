@@ -256,44 +256,103 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 }
             }
             
+            
+            $sql="SELECT * FROM pedidos_estados ORDER BY ID ASC";
+            $Consulta=$obCon->Query($sql);
+            $es=1;
+            while($DatosEstados=$obCon->FetchAssoc($Consulta)){
+                $valuesEstados["values"][$es]=$DatosEstados["ID"];
+                $valuesEstados["text"][$es]=$DatosEstados["EstadoPedido"];
+                $es=$es+1;
+            }
+            
+            
             $sql="SELECT t1.ID,t1.Created, t2.Nombre,t2.Direccion,t2.Telefono,t1.Total,t1.Estado,
                     (SELECT EstadoPedido FROM pedidos_estados t3 WHERE t3.ID=t1.Estado LIMIT 1) as NombreEstado 
                      FROM pedidos t1 INNER JOIN client_user t2 ON t2.ID=t1.cliente_id
                      $Condicion ORDER BY ID DESC LIMIT $PuntoInicio,$Limit;";
             $Consulta=$obCon->Query($sql);
+            
+            
+            
             $i=0;
-            $Filas[]="";
-            while($DatosClasificacion=$obCon->FetchAssoc($Consulta)){
-                $Filas[$i]=$DatosClasificacion;
-                $i=$i+1;
+            $TablaFilas="";
+            while($DatosPedidos=$obCon->FetchAssoc($Consulta)){
+                $TablaFilas.=$css->FilaTabla(16);
+                $id=$DatosPedidos["ID"];                
+                $Ruta="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=1&ID=$id";
+                $LinkPDF='<a href="'.$Ruta.'" target="_blank"><span class="mdi mdi-file-pdf" style="font-size:30px;color:red;cursor:pointer"></span></a>';
+                $TablaFilas.=$css->ColTabla($LinkPDF, 1, "L");
+                
+                $idSel=0;
+                foreach ($valuesEstados["values"] as $key => $value) {
+                    if($DatosPedidos["Estado"]==$value){
+                        $idSel=$key;
+                        //print("$key || $value");
+                    }
+                }
+                $valuesEstados["sel"][$idSel]=1;
+                
+                $htmlSelect=$css->getHtmlSelectBootstrap("cmbEstado_".$id, "cmbEstado_".$id, $valuesEstados, "", "onchange=CambiarEstadoPedido(`$id`)", "style=width:180px;");
+                unset($valuesEstados["sel"][$idSel]);
+                
+                
+                foreach ($DatosPedidos as $key => $value) {
+                    $Align="L";
+                    if($key=="Estado"){
+                        continue;
+                    }if($key=="NombreEstado"){
+                        continue;
+                    }
+                    if($key=="Total"){
+                        $value= number_format($value);
+                        $Align="R";
+                    }
+                    
+                    if($key=="ID"){
+                        $TablaFilas.=$css->ColTabla($value."<br>".$htmlSelect, 1, $Align);
+                        continue;
+                    }
+                    
+                    $TablaFilas.=$css->ColTabla($value, 1, $Align);
+                      
+                }
+                                
+                $TablaFilas.=$css->CierraFilaTabla();  
+                
+                
             }
             
             $z=0;
-            $Titulo="PEDIDOS";
+            $Titulo="<strong>PEDIDOS</strong>";
+            $TablaTitulo=$css->FilaTabla(18);
+                $TablaTitulo.=$css->ColTabla($Titulo, 8, "C","",1);
+            $TablaTitulo.=$css->CierraFilaTabla();
             $js="onclick=FormularioAgregarEditar(`2`)";
             $Columnas[$z++]="<strong>PDF</strong>";
-            $Columnas[$z++]="<strong>Actualizar Estado</strong>";
             $Columnas[$z++]="<strong>ID</strong>";
             $Columnas[$z++]="<strong>Fecha</strong>";
             $Columnas[$z++]="<strong>Nombre</strong>";
             $Columnas[$z++]="<strong>Direccion</strong>";
             $Columnas[$z++]="<strong>Telefono</strong>";
             $Columnas[$z++]="<strong>Total</strong>";
-            $Columnas[$z++]="<strong>Estado Actualizado</strong>";
-            $Columnas[$z++]="<strong>Estado Anterior</strong>";
-            $Ruta="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=1&ID=@value";
+            //$Columnas[$z++]="<strong>Estado</strong>";
+            $TablaColumnas=$css->FilaTabla(18);
+            foreach ($Columnas as $value) {
+                $TablaColumnas.=$css->ColTabla($value, 1, "C","",1);
+            }   
+            $TablaColumnas.=$css->CierraFilaTabla();
+            $TablaApertura=$css->CrearTabla("TablaPedidos", 2);
+            $TablaCierre=$css->CerrarTabla();
+            $headTable=$css->HeadTable();
+            $cHeadTable=$css->CheadTable();
+            $htmlTabla=$TablaApertura.$headTable.$TablaTitulo.$TablaColumnas.$cHeadTable.$TablaFilas.$TablaCierre;
+            
             $values["values"][0]="";
             $values["text"][0]="Cambiar a:";
-            $sql="SELECT * FROM pedidos_estados ORDER BY ID ASC";
-            $Consulta=$obCon->Query($sql);
-            $es=1;
-            while($DatosEstados=$obCon->FetchAssoc($Consulta)){
-                $values["values"][$es]=$DatosEstados["ID"];
-                $values["text"][$es]=$DatosEstados["EstadoPedido"];
-                $es=$es+1;
-            }
             
             
+            /*
             $htmlSelect=$css->getHtmlSelectBootstrap("cmbEstado_@value", "cmbEstado_@value", $values, "", "onchange=CambiarEstadoPedido(`@value`)", "style=width:200px;");
             $Acciones["ID"]["html"]='<a href="'.$Ruta.'" target="_blank"><span class="mdi mdi-file-pdf" style="font-size:30px;color:red;cursor:pointer"></span></a>';
             $Acciones["ID"]["html"].='<td>'.$htmlSelect.'</td>';
@@ -302,9 +361,139 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             //$Acciones["ID"]["icon"]="mdi mdi-file-pdf";
             //$Acciones["ID"]["style"]="style=font-size:20px;color:red;cursor:pointer";
             $htmlTabla=$css->getHtmlTable("<span class='mdi mdi-database-plus' style='font-size:40px;color:green;cursor:pointer' $js></span> <strong>$Titulo</strong>", $Columnas, $Filas,$Acciones);
+            */
             print($htmlTabla);
         break;//Fin canoso 5
-    
+        
+        case 6://Formulario para agregar o editar una clasificacion
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $Editar=0;
+            if($idItem<>''){
+                $Editar=1;
+            }
+            $tab="inventarios_clasificacion";
+            $idLocal=$obCon->normalizar($_SESSION["idLocal"]);            
+            $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
+            $sql="SELECT * FROM $tab WHERE ID='$idItem'";
+            $DatosActuales=$obCon->FetchAssoc($obCon->QueryExterno($sql, HOST, USER, PW, $DatosLocal["db"], ""));
+            $Titulo="<strong>Crear o Editar Clasificación</strong>";
+            $html='
+                        <div class="mdc-card">
+                          <h6 class="card-title">'.$Titulo.'</h6>
+                          <div class="template-demo">
+                            <div class="mdc-layout-grid__inner">';
+            $Cols=6;
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("text", "Clasificacion", "Clasificacion", $DatosActuales["Clasificacion"], "Clasificacion", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $values["values"][0]="1";
+            $values["text"][0]="Activado";
+            $values["values"][1]="0";
+            $values["text"][1]="Deshabilitado";
+            if($DatosActuales["Estado"]==1 or $DatosActuales["Estado"]==''){
+                $values["sel"][0]="1";
+            }
+            if($DatosActuales["Estado"]==0 and $DatosActuales["Estado"]<>''){
+                $values["sel"][1]="1";
+            }
+            $html.=$css->getHtmlSelect("Estado", "Estado", $values, "Estado", "", "style=width:100%;");            
+            $html.="</div><br>";
+            
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlBoton(1, "BtnGuardarEditar", "BtnGuardarEditar", "Guardar", "onclick=ConfirmaGuardarEditar(`1`,`$idItem`)", "width:100px;");
+            $html.="</div>";
+            $html.="</div></div></div>";
+            print($html);
+            
+        break;//Fin caso 6    
+        
+        case 7://Formulario para agregar o editar un producto
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $Editar=0;
+            if($idItem<>''){
+                $Editar=1;
+            }
+            $tab="productos_servicios";
+            $idLocal=$obCon->normalizar($_SESSION["idLocal"]);            
+            $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
+            $sql="SELECT * FROM $tab WHERE ID='$idItem'";
+            $DatosActuales=$obCon->FetchAssoc($obCon->QueryExterno($sql, HOST, USER, PW, $DatosLocal["db"], ""));
+            $Titulo="<strong>Crear o Editar Producto</strong>";
+            $html='
+                        <div class="mdc-card">
+                          <h6 class="card-title">'.$Titulo.'</h6>
+                          <div class="template-demo">
+                            <div class="mdc-layout-grid__inner">';
+            $Cols=6;
+            if($DatosActuales["Referencia"]==''){
+                $Referencia=$obCon->getUniqId();
+            } else {
+                $Referencia=$DatosActuales["Referencia"];
+            }
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $valuesClasificacion["values"][0]="";
+            $valuesClasificacion["text"][0]="Clasificacion";
+            $sql="SELECT * FROM inventarios_clasificacion";
+            $Consulta=$obCon->QueryExterno($sql, HOST, USER, PW, $DatosLocal["db"], "");
+            $i=1;
+            while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
+                $valuesClasificacion["values"][$i]=$DatosConsulta["ID"];
+                $valuesClasificacion["text"][$i]=$DatosConsulta["Clasificacion"];
+                if($DatosActuales["idClasificacion"]==$DatosConsulta["ID"]){
+                    $valuesClasificacion["sel"][$i]="1";
+                }
+                $i=$i+1;
+            }
+                        
+            $html.=$css->getHtmlSelect("idClasificacion", "idClasificacion", $valuesClasificacion, "Clasificacion", "", "style=width:100%;"); 
+            $html.="";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("text", "Referencia", "Referencia", $Referencia, "Referencia", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("text", "Nombre", "Nombre", $DatosActuales["Nombre"], "Nombre", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("text", "PrecioVenta", "PrecioVenta", $DatosActuales["PrecioVenta"], "Precio de Venta", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("textarea", "DescripcionCorta", "DescripcionCorta", $DatosActuales["DescripcionCorta"], "Descripcion Corta", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("textarea", "DescripcionLarga", "DescripcionLarga", $DatosActuales["DescripcionLarga"], "Descripcion Larga", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $Orden=$DatosActuales["Orden"];
+            if($DatosActuales["Orden"]==""){
+                $Orden=1;
+            }
+            $html.=$css->getHtmlInput("number", "Orden", "Orden", $Orden, "Orden", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("file", "ImagenProducto", "ImagenProducto", "", "Imagen", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $values["values"][0]="1";
+            $values["text"][0]="Activado";
+            $values["values"][1]="0";
+            $values["text"][1]="Deshabilitado";
+            if($DatosActuales["Estado"]==1 or $DatosActuales["Estado"]==''){
+                $values["sel"][0]="1";
+            }
+            if($DatosActuales["Estado"]==0 and $DatosActuales["Estado"]<>''){
+                $values["sel"][1]="1";
+            }
+            $html.=$css->getHtmlSelect("Estado", "Estado", $values, "Estado", "", "style=width:100%;");            
+            $html.="</div><br>";
+            
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlBoton(1, "BtnGuardarEditar", "BtnGuardarEditar", "Guardar", "onclick=ConfirmaGuardarEditar(`2`,`$idItem`)", "width:100px;");
+            $html.="</div>";
+            $html.="</div></div></div>";
+            print($html);
+            
+        break;//Fin caso 7
         
  }
     

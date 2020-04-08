@@ -26,8 +26,8 @@ CREATE TABLE `pedidos_items` (
 CREATE TABLE `productos_servicios` (
   `ID` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
   `Referencia` varchar(100) COLLATE utf8_spanish_ci NOT NULL,
-  `Nombre` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
-  `DescripcionCorta` varchar(45) COLLATE utf8_spanish_ci NOT NULL,
+  `Nombre` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
+  `DescripcionCorta` varchar(200) COLLATE utf8_spanish_ci NOT NULL,
   `DescripcionLarga` text COLLATE utf8_spanish_ci NOT NULL,
   `PrecioVenta` double NOT NULL,
   `idClasificacion` int(11) NOT NULL,

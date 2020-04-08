@@ -19,7 +19,7 @@ $css->ShoppingCar("onclick=VerCarrito();");
 $css->botonNavegacion("onclick=ListarCategoria()", "black", "pageNav-home-icon mdi mdi-home");
 $css->botonNavegacion("onclick=ListarAnterior()", "black", "pageNav-back-icon mdi mdi-skip-backward");
 $css->botonNavegacion("onclick=ListarSiguiente()", "black", "pageNav-forward-icon mdi mdi-skip-forward");
-//$css->modal("modalMain", "DOMI", "DivModal");
+$css->modal("modalMain", "DOMI", "DivModal");
 
 $css->PageInit($myTitulo);
     

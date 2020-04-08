@@ -180,6 +180,7 @@ if( !empty($_REQUEST["Accion"]) ){
             print("OK;Tu Pedido fué descartado");
         break;//Fin caso 6
         
+        
     }
           
 }else{
