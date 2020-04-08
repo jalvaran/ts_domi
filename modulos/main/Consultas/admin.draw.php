@@ -89,9 +89,25 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $html.='<input id="BusquedaAdmin" class="form-control" placeholder="Buscar..." onchange="VerMenuSegunID();Page=1;">';
             //$html.=" &nbsp;".$css->getHtmlInput("text", "BusquedaAdmin", "", "", "Buscar", "onchange=VerMenuSegunID()", "style=width:200px;", "", "1");
             $html.='';
+            
             print($html);
-            
-            
+            print('</div>');
+            print('<div id="divMenu" class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--span-12-tablet">');
+             
+                
+                $sql="SELECT * FROM pedidos_estados ORDER BY ID ASC";
+                $Consulta=$obCon->Query($sql);
+                $valuesEstados["values"][0]="";
+                $valuesEstados["text"][0]="Mostrar pedidos por estado";
+                $es=1;
+                while($DatosEstados=$obCon->FetchAssoc($Consulta)){
+                    $valuesEstados["values"][$es]=$DatosEstados["ID"];
+                    $valuesEstados["text"][$es]=$DatosEstados["EstadoPedido"];
+                    $es=$es+1;
+                }
+
+                $htmlSelect=$css->getHtmlSelectBootstrap("cmbSelectFiltroPedidos", "cmbSelectFiltroPedidos", $valuesEstados, "Seleccione un estado", "onchange=adminPedidos();Page=1;", "");
+                print($htmlSelect);
             print('</div>');
             
             print('<div  class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--span-12-tablet">');
@@ -165,6 +181,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);            
             $Page=$obCon->normalizar($_REQUEST["Page"]);
             $Busqueda=$obCon->normalizar($_REQUEST["Busqueda"]);
+            
             if($Page==''){
                 $Page=1;
                 
@@ -224,6 +241,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);            
             $Page=$obCon->normalizar($_REQUEST["Page"]);
             $Busqueda=$obCon->normalizar($_REQUEST["Busqueda"]);
+            $FiltroEstado=$obCon->normalizar($_REQUEST["FiltroEstado"]);
             if($Page==''){
                 $Page=1;
                 
@@ -233,7 +251,9 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             if($Busqueda<>''){
                 $Condicion.=" AND (t1.ID='$Busqueda' or t2.Nombre like '%$Busqueda%' or t2.Telefono like '$Busqueda%')";
             }
-            
+            if($FiltroEstado<>''){
+                $Condicion.=" AND Estado='$FiltroEstado'";
+            }
             $PuntoInicio = ($Page * $Limit) - $Limit;
             
             $sql = "SELECT COUNT(t1.ID) as Items 
@@ -277,7 +297,11 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             
             $i=0;
             $TablaFilas="";
+            $TotalPedidos=0;
+            $Items=0;
             while($DatosPedidos=$obCon->FetchAssoc($Consulta)){
+                $TotalPedidos=$DatosPedidos["Total"];
+                $Items=$Items+1;
                 $TablaFilas.=$css->FilaTabla(16);
                 $id=$DatosPedidos["ID"];                
                 $Ruta="../../general/Consultas/PDF_Documentos.draw.php?idDocumento=1&ID=$id";
@@ -324,7 +348,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             }
             
             $z=0;
-            $Titulo="<strong>PEDIDOS</strong>";
+            $Titulo="MOSTRANDO <strong>".number_format($Items)."</strong> PEDIDOS PARA UN TOTAL DE: <strong>$". number_format($TotalPedidos)."</strong>";
             $TablaTitulo=$css->FilaTabla(18);
                 $TablaTitulo.=$css->ColTabla($Titulo, 8, "C","",1);
             $TablaTitulo.=$css->CierraFilaTabla();

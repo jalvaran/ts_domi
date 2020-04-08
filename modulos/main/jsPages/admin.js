@@ -248,10 +248,12 @@ function adminPedidos(){
     var idDiv="divAdmin";
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
     var Busqueda=document.getElementById('BusquedaAdmin').value;
+    var FiltroEstado=document.getElementById('cmbSelectFiltroPedidos').value;
     var form_data = new FormData();
         form_data.append('Accion', 5);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
         form_data.append('Token_user', idClientUser);
         form_data.append('Busqueda', Busqueda);
+        form_data.append('FiltroEstado', FiltroEstado);
         form_data.append('Page', Page);
         
        $.ajax({// se arma un objecto por medio de ajax  
