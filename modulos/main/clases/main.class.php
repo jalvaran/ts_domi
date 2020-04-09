@@ -101,6 +101,9 @@ class Domi extends conexion{
         $sql.=" WHERE ID='$idCliente'";
         $this->Query($sql);
     }
+    
+    
+    
    
     /**
      * Fin Clase

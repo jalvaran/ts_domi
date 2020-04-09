@@ -463,7 +463,10 @@ function ConfimarSolicitarPedidos(idUserClient){
     alertify.confirm('Seguro que desea Realizar el pedido? ',
         function (e) {
             if (e) {
-                CrearPedido(idUserClient);
+                grecaptcha.execute('6LdoC-gUAAAAADi7iGr_b8WtxMijj24V8v-dAtB-', {action: 'homepage'}).then(function(token) {
+                     CrearPedido(idUserClient,token);
+                });
+                
             }else{
                 alertify.error("Se canceló el proceso");
                 return;
@@ -473,11 +476,17 @@ function ConfimarSolicitarPedidos(idUserClient){
 }
 
 
-function CrearPedido(idUserClient){
+function CrearPedido(idUserClient,token){
+    
     var NombreCliente=document.getElementById('NombreCliente').value;
     var DireccionCliente=document.getElementById('DireccionCliente').value;
     var Telefono=document.getElementById('Telefono').value;
     var ObservacionesPedido=document.getElementById('ObservacionesPedido').value;
+    
+    
+    var idDiv="divMain";
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess">Enviando pedidos a los locales...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
+    
     
     var form_data = new FormData();
         form_data.append('Accion', '5'); 
@@ -486,6 +495,8 @@ function CrearPedido(idUserClient){
         form_data.append('Telefono', Telefono);
         form_data.append('ObservacionesPedido', ObservacionesPedido);
         form_data.append('idUserClient', idUserClient);
+        form_data.append('token', token);
+        form_data.append('action', 'homepage');
                         
         $.ajax({
         url: './procesadores/main.process.php',

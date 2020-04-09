@@ -144,6 +144,13 @@ if( !empty($_REQUEST["Accion"]) ){
         break;//Fin caso 4
         
         case 5://Solicitar pedido
+            $token = $_POST['token'];
+            $action = $_POST['action'];      
+            
+            $respuestaToken=$obCon->validaTokenGoogle($token, $action,RECAPTCHA_V3_SECRET_KEY);
+            if($respuestaToken["success"]<>1 or $respuestaToken["action"]<>$action){
+                exit("E1;El token no coincide");
+            }
             $idUserClient=$obCon->normalizar($_REQUEST["idUserClient"]);  
             $NombreCliente=$obCon->normalizar($_REQUEST["NombreCliente"]);  
             $DireccionCliente=$obCon->normalizar($_REQUEST["DireccionCliente"]);  
@@ -171,14 +178,9 @@ if( !empty($_REQUEST["Accion"]) ){
             $htmlMensaje="";
             $Ruta=$obCon->DevuelveValores("configuracion_general", "ID", 2003);//Ruta del pdf para ver el pedido
             
-            $htmlMensaje='<div><h2><strong>Tienes nuevos Pedidos de la Plataforma DoMi!</strong></h2></div>';
-            $htmlMensaje.='<table><tr><th><strong>LISTA DE PEDIDOS:</strong></th></tr>';
-            $htmlMensaje.='<tr>
-                                <th><strong>ID</strong></th>
-                                <th><strong>Fecha</strong></th>
-                                <th><strong>Local</strong></th>
-                                <th><strong>PDF</strong></th>
-                            </tr>';
+            $htmlMensaje='<div class="table-responsive"><h2><strong>Tienes nuevos Pedidos de la Plataforma DoMi!</strong></h2></div>';
+            $htmlMensaje.='<table class="table"><tr><th><strong>LISTA DE PEDIDOS:</strong></th></tr>';
+            
             $i=0;
             while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
                 $Link=$Ruta["Valor"].$DatosConsulta["ID"];
@@ -186,8 +188,8 @@ if( !empty($_REQUEST["Accion"]) ){
                     $MailReport["Email"][$i]=$DatosConsulta["Email"];
                     $MailReport["Asunto"][$i]="PEDIDO DOMI ".$DatosConsulta["ID"];
                     
-                    $htmlReport='<div><h2><strong>Tienes nuevos Pedidos de la Plataforma DoMi!</strong></h2></div>';
-                    $htmlReport.='<table><tr><th><strong>LISTA DE PEDIDOS:</strong></th></tr>';
+                    $htmlReport='<div class="table-responsive"><h2><strong>Tienes nuevos Pedidos de la Plataforma DoMi!</strong></h2></div>';
+                    $htmlReport.='<table class="table"><tr><th><strong>LISTA DE PEDIDOS:</strong></th></tr>';
                     $htmlReport.='<tr>
                                         <th><strong>ID</strong></th>
                                         <th><strong>Fecha</strong></th>
@@ -206,9 +208,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 }
                 
                 $htmlMensaje.='<tr>
-                                <th>'.$DatosConsulta["ID"].'</th>
-                                <th>'.$DatosConsulta["Created"].'</th>
-                                <th>'.$DatosConsulta["Nombre"].'</th>
+                                
                                 <th><a href="'.$Link.'" target="_blank">VER PDF</th>
                             </tr>';
                 

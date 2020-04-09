@@ -147,7 +147,9 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                             
                             $Consulta=$obCon->Query2($sql, HOST, USER, PW, $dbLocal, "");
                             while($DatosProductos=$obCon->FetchAssoc($Consulta)){
-                                $html=$css->getHtmlInfoProducto($idClientUser, $idLocal, $DatosProductos["ID"], $DatosProductos["Nombre"], $DatosProductos["DescripcionCorta"], $DatosProductos["RutaImagen"], $DatosProductos["PrecioVenta"]);
+                                $RutaImagen= str_replace("../", "", $DatosProductos["RutaImagen"]);
+                                $RutaImagen="../../".$RutaImagen;
+                                $html=$css->getHtmlInfoProducto($idClientUser, $idLocal, $DatosProductos["ID"], $DatosProductos["Nombre"], $DatosProductos["DescripcionCorta"], $RutaImagen, $DatosProductos["PrecioVenta"]);
                                 $css->divForm($DatosProductos["Nombre"], $html, "", "style=width:100%", $col);
                             }
                             

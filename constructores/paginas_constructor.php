@@ -47,6 +47,8 @@ class PageConstruct extends html_estruct_class{
             $this->Chead();
             $this->body("", "");
                 print('<script src="../../assets/js/preloader.js"></script>');
+                print('<script src="https://www.google.com/recaptcha/api.js?render=6LdoC-gUAAAAADi7iGr_b8WtxMijj24V8v-dAtB-"></script>');
+                
                 print('<div class="body-wrapper">');
             //$this->CrearDiv("", "body-wrapper", "", 1, 1);
         }
@@ -237,6 +239,17 @@ class PageConstruct extends html_estruct_class{
                 <!-- Custom js for this page-->
                 
                 ');
+                /*
+                print("<script>
+                        grecaptcha.ready(function() {
+                            grecaptcha.execute('6LdoC-gUAAAAADi7iGr_b8WtxMijj24V8v-dAtB-', {action: 'homepage'}).then(function(token) {
+                               
+                            });
+                        });
+                        </script>
+                        ");
+                 * 
+                 */
         
         
     }
@@ -275,7 +288,7 @@ class PageConstruct extends html_estruct_class{
         
         print('<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop mdc-layout-grid__cell--span-'.$Cols.'-tablet" '.$js.' '.$style.'>
                 <div class="mdc-card info-card info-card--'.$ColorIcon.'">
-                  <div class="card-inner" style="background-image:url('.$Fondo.');background-repeat: no-repeat;background-size: 100% 90%;">
+                  <div class="card-inner" style="background-image:url('.$Fondo.');background-repeat: no-repeat;background-size: 300px 90%;">
                     <br>
                     <br>
                     <br>
