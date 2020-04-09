@@ -5,23 +5,13 @@
  * 
  */
 
-/**
- * Limpia los divs de la compra despues de guardar
- * @returns {undefined}
- */
-function LimpiarDivs(){
-    document.getElementById('DivProcess').innerHTML='';
-    
-    //document.getElementById('DivTotalesCompra').innerHTML='';
-}
-
 function ConfirmarMigracion(){
     
-    alertify.confirm('Está seguro que desea Ejecutar las migraciones?</strong>',
+    alertify.confirm('Desea Ejecutar las migraciones?</strong>',
         function (e) {
             if (e) {
 
-                alertify.success("Iniciando Migraciones");                    
+                alertify.success("Validando Migraciones");                    
                 IniciarMigraciones();
             }else{
                 alertify.error("Se canceló el proceso");
@@ -36,14 +26,13 @@ function ConfirmarMigracion(){
  * @returns {undefined}
  */
 function IniciarMigraciones(){
-    document.getElementById("DivProcess").innerHTML='<div id="GifProcess">Procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
-    
-    document.getElementById('BtnSubir').disabled=true;
-    document.getElementById('BtnSubir').value="Migrando...";
-    
+    AbreModal('modalMain');
+    var idDiv="DivModal";
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess">Procesando...<br><img   src="../../images/loader.gif" alt="Cargando" height="100" width="100"></div>';
+        
     var form_data = new FormData();
         form_data.append('Accion', 1);
-        
+        form_data.append('Token_user', idClientUser);
         
         
         $.ajax({
@@ -57,28 +46,22 @@ function IniciarMigraciones(){
         success: function(data){
            var respuestas = data.split(';'); 
            if(respuestas[0]==="OK"){  //SI no existe 
-                $('.progress-bar').css('width','20%').attr('aria-valuenow', 20);  
-                document.getElementById('LyProgresoUP').innerHTML="20%";
+                
                 alertify.success(respuestas[1]);
                 EjecutarMigraciones(1);
             }else if(respuestas[0]==="E1"){ //Si existe debe pedir o no actualizacion
-                LimpiarDivs();
-                
-                document.getElementById('BtnSubir').disabled=false;
-                document.getElementById('BtnSubir').value="Ejecutar";
+                document.getElementById(idDiv).innerHTML=respuestas[1];
                 return;      
                 
             }else{
-                LimpiarDivs();
-                document.getElementById('BtnSubir').disabled=false;
-                document.getElementById('BtnSubir').value="Ejecutar";
+                document.getElementById(idDiv).innerHTML=data;
                 alertify.alert(data);
                 
             }
             
         },
         error: function (xhr, ajaxOptions, thrownError) {
-            LimpiarDivs();
+            
             alert(xhr.status);
             alert(thrownError);
           }
@@ -91,16 +74,13 @@ function IniciarMigraciones(){
  */
 function EjecutarMigraciones(MigracionActual){
     
-    
-    
-    
-    
+    var idDiv="DivModal";
     
     var form_data = new FormData();
         form_data.append('Accion', 2);        
         
         form_data.append('MigracionActual', MigracionActual);
-        
+        form_data.append('Token_user', idClientUser);
       
     $.ajax({
         //async:false,
@@ -114,41 +94,27 @@ function EjecutarMigraciones(MigracionActual){
         success: function(data){
             var respuestas = data.split(';'); 
            if(respuestas[0]==="OK"){   
-               $('.progress-bar').css('width','100%').attr('aria-valuenow', 100);  
-                document.getElementById('LyProgresoUP').innerHTML="100%";
-                alertify.success(respuestas[1]);
-                document.getElementById('BtnSubir').disabled=false;
-                document.getElementById('BtnSubir').value="Ejecutar";
-                LimpiarDivs();
-                //GuardeEnTemporal();
-            }else if(respuestas[0]==="E1"){
-                LimpiarDivs();
+               document.getElementById(idDiv).innerHTML=(respuestas[1]);
+               alertify.success(respuestas[1]);
                 
-                document.getElementById('DivMensajes').innerHTML=(respuestas[1]);
-                document.getElementById('BtnSubir').disabled=false;
-                document.getElementById('BtnSubir').value="Ejecutar";
+            }else if(respuestas[0]==="E1"){
+                                
+                document.getElementById(idDiv).innerHTML=(respuestas[1]);
+                
                 return;                
             }else{
-                LimpiarDivs();
                 
-                document.getElementById('DivMensajes').innerHTML=data;
-                document.getElementById('BtnSubir').disabled=false;
-                document.getElementById('BtnSubir').value="Ejecutar";
+                
+                document.getElementById(idDiv).innerHTML=data;
+                
             }
             
         },
         error: function (xhr, ajaxOptions, thrownError) {
-            LimpiarDivs();
-            document.getElementById('BtnSubir').disabled=false;
-            document.getElementById('BtnSubir').value="Ejecutar";
+            
             alert(xhr.status);
             alert(thrownError);
           }
       })
 }
 
-function ObtengaHora(){
-    var f=new Date();
-    var cad=f.getHours()+":"+f.getMinutes()+":"+f.getSeconds(); 
-    return (cad)
-}

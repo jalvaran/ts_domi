@@ -35,12 +35,14 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             while($DatosCategorias=$obCon->FetchAssoc($Consulta)){
                 $idItem=$DatosCategorias["ID"];
                 $js="onclick=DibujaLocal(`$idItem`)";
-                $Fondo="../../images/image.webp";
+                $RutaImagen="../../images/image.webp";
                 $DatosFondo=$obCon->DevuelveValores("locales_imagenes", "idLocal", $idItem);
                 if($DatosFondo["ID"]<>''){
-                    $Fondo=$DatosFondo["Ruta"];
+                    $RutaImagen= str_replace("../", "", $DatosFondo["Ruta"]);
+                    $RutaImagen="../../".$RutaImagen;
+                    
                 }
-                $css->divCardLocales($Fondo,($DatosCategorias["Nombre"]), ($DatosCategorias["Descripcion"]), ($DatosCategorias["Telefono"]."<br>".$DatosCategorias["Direccion"]), $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
+                $css->divCardLocales($RutaImagen,($DatosCategorias["Nombre"]), ($DatosCategorias["Descripcion"]), ($DatosCategorias["Telefono"]."<br>".$DatosCategorias["Direccion"]), $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
 
             }
             
@@ -51,10 +53,11 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $idLocal=$obCon->normalizar($_REQUEST["idLocal"]);
             $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
             $js="onclick=DibujaLocal(`$idLocal`)";
-            $Fondo="../../images/image.webp";
+            $RutaImagen="../../images/image.webp";
             $DatosFondo=$obCon->DevuelveValores("locales_imagenes", "idLocal", $idLocal);
             if($DatosFondo["ID"]<>''){
-                $Fondo=$DatosFondo["Ruta"];
+                $RutaImagen= str_replace("../", "", $DatosFondo["Ruta"]);
+                $RutaImagen="../../".$RutaImagen;
             }
             $dbLocal=$DatosLocal["db"];
             $sql="SELECT * FROM inventarios_clasificacion WHERE Estado=1";
@@ -65,7 +68,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 $values["values"][$i]=$DatosConsulta["ID"];       $values["text"][$i]=$DatosConsulta["Clasificacion"];
                 $i=$i+1;
             }
-            $css->divCardLocales($Fondo,($DatosLocal["Nombre"]), ($DatosLocal["Descripcion"]), ($DatosLocal["Telefono"]."<br>".$DatosLocal["Direccion"]), $DatosLocal["Icono"], $DatosLocal["ColorIcono"],$js,"style=cursor:pointer",12);       
+            $css->divCardLocales($RutaImagen,($DatosLocal["Nombre"]), ($DatosLocal["Descripcion"]), ($DatosLocal["Telefono"]."<br>".$DatosLocal["Direccion"]), $DatosLocal["Icono"], $DatosLocal["ColorIcono"],$js,"style=cursor:pointer",12);       
             
             $style="style='width:130%;'";
             $js="onchange=ListarProductos(`$idLocal`);Page=1;"; 

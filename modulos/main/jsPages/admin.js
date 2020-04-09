@@ -16,6 +16,9 @@ function VerMenuSegunID(){
     if(idMenuAdmin==3){
         adminPedidos();
     }
+    if(idMenuAdmin==4){
+        adminLocales();
+    }
 }
 function pageMinusAdmin(){
     if(Page>1){
@@ -326,6 +329,9 @@ function FormularioAgregarEditar(idTabla,idItem=""){
     if(idTabla==2){
         var Accion=7;
     }
+    if(idTabla==3){
+        var Accion=9;
+    }
     var idDiv="divAdmin";
     document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
     
@@ -368,6 +374,9 @@ function ConfirmaGuardarEditar(Tabla,idItem){
                 }
                 if(Tabla==2){
                     GuardarEditarProducto(idItem);
+                }
+                if(Tabla==3){
+                    GuardarEditarLocal(idItem);
                 }
                 
             }else{
@@ -475,3 +484,101 @@ function GuardarEditarProducto(idItem){
       });
 }
 
+function adminLocales(){
+    idMenuAdmin=4;
+    var idDiv="divAdmin";
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
+    var Busqueda=document.getElementById('BusquedaAdmin').value;
+    var form_data = new FormData();
+        form_data.append('Accion', 8);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        form_data.append('Token_user', idClientUser);
+        form_data.append('Busqueda', Busqueda);
+        form_data.append('Page', Page);
+        
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/admin.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){   
+            
+            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+            initForm();
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            document.getElementById(idDiv).innerHTML="hay un problema!";
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function GuardarEditarLocal(idItem){
+    
+    var idCategoria=document.getElementById('idCategoria').value;
+    var Nombre=document.getElementById('Nombre').value;
+    var Direccion=document.getElementById('Direccion').value;
+    var Telefono=document.getElementById('Telefono').value;
+    var Email=document.getElementById('Email').value;
+    var Password=document.getElementById('Password').value;
+    var Descripcion=document.getElementById('Descripcion').value;
+    var Orden=document.getElementById('Orden').value;
+    var Estado=document.getElementById('Estado').value;
+    
+    var form_data = new FormData();
+       
+        form_data.append('Accion', '6'); 
+        form_data.append('Token_user', idClientUser);
+        form_data.append('idItem', idItem);
+        
+        form_data.append('idCategoria', idCategoria);
+        form_data.append('Nombre', Nombre);
+        form_data.append('Direccion', Direccion);
+        form_data.append('Telefono', Telefono);
+        form_data.append('Email', Email);
+        form_data.append('Password', Password);
+        form_data.append('Descripcion', Descripcion);
+        form_data.append('Orden', Orden);
+        form_data.append('Estado', Estado);
+        form_data.append('Fondo', $('#Fondo').prop('files')[0]);
+        
+                              
+        $.ajax({
+        url: './procesadores/admin.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){ 
+                alertify.success(respuestas[1]);                
+                VerMenuSegunID(); 
+                if(idItem==''){
+                    ConfirmarMigracion();
+                }
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
+            }else{
+                alertify.alert(data);                
+            }
+                    
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+     
+}

@@ -387,5 +387,22 @@ class conexion extends db_conexion{
         return($arrResponse);
     }
     
+    public function VerificaSesion($Token_user) {
+        if(isset($_SESSION["idLocal"])){
+            if($_SESSION["Token"]==$Token_user){
+                $DatosSesion["Estado"]="OK";
+                $DatosSesion["Mensaje"]="Sesion iniciada correctamente";
+            }else{
+                $DatosSesion["Estado"]="E1";
+                $DatosSesion["Mensaje"]="El token ha cambiado, debe iniciar sesion de nuevo";
+            }
+            
+        }else{
+            $DatosSesion["Estado"]="E1";
+            $DatosSesion["Mensaje"]="No se ha iniciado sesion";
+        }
+        return($DatosSesion);
+    }
+    
 }
 ?>

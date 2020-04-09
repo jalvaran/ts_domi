@@ -27,6 +27,7 @@ $css->PageEnd();
 
 print('<script src="jsPages/admin.js"></script>');  //script propio de la pagina
 print('<script src="jsPages/main.js"></script>');  //script propio de la pagina
+print('<script src="jsPages/migrations.js"></script>');  //script propio de la pagina
 
 $css->Cbody();
 $css->Chtml();

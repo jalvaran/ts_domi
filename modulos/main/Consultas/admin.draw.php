@@ -82,8 +82,16 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
             $css->CrearTitulo("<strong>".$DatosLocal["Nombre"]."</strong>", 1);
             print('<div id="divMenu" class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--span-12-tablet">');
-                    
-            $html=$css->getHtmlBoton(1, "MnuClasificacion", "MnuClasificacion", "Clasificación", "onclick=adminClasificacion();Page=1;", "width:150px;");
+            $html="";
+            if($idLocal==1){
+                $html=$css->getHtmlBoton(4, "MnuLocales", "MnuLocales", "Locales", "onclick=adminLocales();Page=1;", "width:150px;");
+                $html.=$css->getHtmlBoton(3, "MnuMigraciones", "MnuMigraciones", "Migraciones", "onclick=ConfirmarMigracion();", "width:150px;");
+            } 
+            $html.=" &nbsp;";
+            $css->Cdiv();
+            print('<div id="divMenu" class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12 mdc-layout-grid__cell--span-12-tablet">');
+                   
+            $html.=$css->getHtmlBoton(1, "MnuClasificacion", "MnuClasificacion", "Clasificación", "onclick=adminClasificacion();Page=1;", "width:150px;");
             $html.=" &nbsp;".$css->getHtmlBoton(2, "MnuProductos", "MnuProductos", "Productos", "onclick=adminProductos();Page=1;", "width:150px;");
             $html.=" &nbsp;".$css->getHtmlBoton(5, "MnuPedidos", "MnuPedidos", "Pedidos", "onclick=adminPedidos();Page=1;", "width:150px;");
             $html.='<input id="BusquedaAdmin" class="form-control" placeholder="Buscar..." onchange="VerMenuSegunID();Page=1;">';
@@ -519,7 +527,159 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             
         break;//Fin caso 7
         
- }
+        case 8://Dibujo el listado de los locales
+            $Limit=20;
+            $idLocal=$obCon->normalizar($_SESSION["idLocal"]);            
+            $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);            
+            $Page=$obCon->normalizar($_REQUEST["Page"]);
+            $Busqueda=$obCon->normalizar($_REQUEST["Busqueda"]);
+            if($Page==''){
+                $Page=1;
+                
+            }
+            $Condicion=" WHERE ID>0 ";
+            
+            if($Busqueda<>''){
+                $Condicion.=" AND ( ID='$Busqueda' or Nombre like '%$Busqueda%' or Telefono like '%$Busqueda%'  )";
+            }
+            
+            $PuntoInicio = ($Page * $Limit) - $Limit;
+            
+            $sql = "SELECT COUNT(t1.ID) as Items 
+                   FROM locales t1 $Condicion;";
+            
+            $Consulta2=$obCon->QueryExterno($sql, HOST, USER, PW, DB, "");
+            $totales = $obCon->FetchAssoc($Consulta2);
+            $ResultadosTotales = $totales['Items'];
+            
+            if($ResultadosTotales>$Limit){
+                $TotalPaginas= ceil($ResultadosTotales/$Limit);
+                if($Page>1){
+                    $js="onclick=pageMinusAdmin();";
+                    $css->botonNavegacion($js, "green", "pageNav-pageBack-icon mdi mdi-arrow-left-bold", "PageMinus");
+                }
+                if($ResultadosTotales>($PuntoInicio+$Limit)){
+                    $js="onclick=pageAddAdmin();";
+                    $css->botonNavegacion($js, "green", "pageNav-pageForward-icon mdi mdi-arrow-right-bold", "PageAdd");
+                }
+            }
+            
+            $sql="SELECT ID, Nombre,Direccion,Telefono,Email, Estado FROM locales $Condicion ORDER BY ID DESC LIMIT $PuntoInicio,$Limit;";
+            $Consulta=$obCon->QueryExterno($sql, HOST, USER, PW, DB, "");
+            $i=0;
+            $Filas[]="";
+            while($DatosClasificacion=$obCon->FetchAssoc($Consulta)){
+                $Filas[$i]=$DatosClasificacion;
+                $i=$i+1;
+            }
+            $z=0;
+            $js="onclick=FormularioAgregarEditar(`3`)";
+            $Columnas[$z++]="<strong>Editar</strong>";
+            $Columnas[$z++]="<strong>ID</strong>";
+            $Columnas[$z++]="<strong>Nombre</strong>";
+            $Columnas[$z++]="<strong>Direccion</strong>";
+            $Columnas[$z++]="<strong>Telefono</strong>";
+            $Columnas[$z++]="<strong>Email</strong>";
+            $Columnas[$z++]="<strong>Estado</strong>";
+            $Acciones["ID"]["js"]="onclick=FormularioAgregarEditar(`3`,`@value`)";
+            $Acciones["ID"]["icon"]="mdi mdi-database-edit";
+            $Acciones["ID"]["style"]="style=font-size:20px;color:blue;cursor:pointer";
+            $htmlTabla=$css->getHtmlTable("<span class='mdi mdi-database-plus' style='font-size:40px;color:green;cursor:pointer' $js></span> <strong>LOCALES</strong>", $Columnas, $Filas,$Acciones);
+            print($htmlTabla);
+        break;//fin caso 8    
+        
+        case 9://Formulario para agregar o editar un local
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $Editar=0;
+            if($idItem<>''){
+                $Editar=1;
+            }
+            $tab="locales";
+            $idLocal=$obCon->normalizar($_SESSION["idLocal"]);
+            if($idLocal<>1){
+                exit("Zona prohibida");
+            }
+            
+            $sql="SELECT * FROM $tab WHERE ID='$idItem'";
+            $DatosActuales=$obCon->FetchAssoc($obCon->QueryExterno($sql, HOST, USER, PW, DB, ""));
+            $Titulo="<strong>Crear o Editar un local</strong>";
+            $html='
+                        <div class="mdc-card">
+                          <h6 class="card-title">'.$Titulo.'</h6>
+                          <div class="template-demo">
+                            <div class="mdc-layout-grid__inner">';
+            $Cols=6;
+            
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $valuesClasificacion["values"][0]="";
+            $valuesClasificacion["text"][0]="Categoria";
+            $sql="SELECT * FROM catalogo_categorias";
+            $Consulta=$obCon->QueryExterno($sql, HOST, USER, PW, DB, "");
+            $i=1;
+            while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
+                $valuesClasificacion["values"][$i]=$DatosConsulta["ID"];
+                $valuesClasificacion["text"][$i]=$DatosConsulta["Nombre"];
+                if($DatosActuales["idCategoria"]==$DatosConsulta["ID"]){
+                    $valuesClasificacion["sel"][$i]="1";
+                }
+                $i=$i+1;
+            }
+                        
+            $html.=$css->getHtmlSelect("idCategoria", "idCategoria", $valuesClasificacion, "Categoria", "", "style=width:100%;"); 
+                        
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("text", "Nombre", "Nombre", $DatosActuales["Nombre"], "Nombre", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("text", "Direccion", "Direccion", $DatosActuales["Direccion"], "Direccion", "", "", "", 1);
+            $html.="</div>";            
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("text", "Telefono", "Telefono", $DatosActuales["Telefono"], "Telefono", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("email", "Email", "Email", $DatosActuales["Email"], "Email", "", "", "", 1);
+            $html.="</div>";     
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("password", "Password", "Password", $DatosActuales["Password"], "Password", "", "", "", 1);
+            $html.="</div>";     
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("textarea", "Descripcion", "Descripcion", $DatosActuales["Descripcion"], "Descripcion", "", "", "", 1);
+            $html.="</div>";
+            
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $Orden=$DatosActuales["Orden"];
+            if($DatosActuales["Orden"]==""){
+                $Orden=1;
+            }
+            $html.=$css->getHtmlInput("number", "Orden", "Orden", $Orden, "Orden", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("file", "Fondo", "Fondo", "", "Imagen", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $values["values"][0]="1";
+            $values["text"][0]="Activado";
+            $values["values"][1]="0";
+            $values["text"][1]="Deshabilitado";
+            if($DatosActuales["Estado"]==1 or $DatosActuales["Estado"]==''){
+                $values["sel"][0]="1";
+            }
+            if($DatosActuales["Estado"]==0 and $DatosActuales["Estado"]<>''){
+                $values["sel"][1]="1";
+            }
+            $html.=$css->getHtmlSelect("Estado", "Estado", $values, "Estado", "", "style=width:100%;");            
+            $html.="</div><br>";
+            
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlBoton(1, "BtnGuardarEditar", "BtnGuardarEditar", "Guardar", "onclick=ConfirmaGuardarEditar(`3`,`$idItem`)", "width:100px;");
+            
+            $html.="</div>";
+            $html.="</div></div></div>";
+            print($html);
+            
+        break;//Fin caso 9
+        
+ }      
     
           
 }else{
