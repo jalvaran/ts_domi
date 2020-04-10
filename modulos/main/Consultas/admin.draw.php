@@ -697,7 +697,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             if($idProducto==''){
                 exit("No se recibió el id del producto");                
             }
-            $Condicion=" WHERE ID<>'' ";
+            $Condicion=" WHERE idProducto='$idProducto' ";
             
             if($Busqueda<>''){
                 $Condicion.=" AND (NombreArchivo like '%$Busqueda%' )";

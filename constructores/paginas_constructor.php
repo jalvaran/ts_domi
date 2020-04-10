@@ -456,7 +456,7 @@ class PageConstruct extends html_estruct_class{
         
         $style="style='width:130%;'";
         $html='<div class="col-md-12">';
-            $html.='<img src="'.$RutaImagen.'" style="width:200px;height:150px;"></img>';
+            $html.='<a href="javascript:void(0)" onclick=MostrarGaleriaProducto(`'.$idLocal.'`,`'.$idProducto.'`)><img src="'.$RutaImagen.'" style="width:200px;height:150px;"></img></a>';
         $html.='</div>';
         $html.='</br>';
         $html.='<div class="col-md-12">';

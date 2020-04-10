@@ -612,6 +612,38 @@ function BuscarLocal(){
       });
 }
 
+
+function MostrarGaleriaProducto(idLocal,idProducto){
+    
+    AbreModal('modalMain');
+    var idDiv="DivModal";
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 8);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        form_data.append('idProducto', idProducto);
+        form_data.append('idLocal', idLocal);
+                
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/main.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+             },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            document.getElementById(idDiv).innerHTML="hay un problema!";
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
 function MostrarLinksEnlaces(){
     
     if($("#aLinkProducto").length){

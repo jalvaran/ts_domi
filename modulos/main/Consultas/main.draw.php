@@ -371,6 +371,64 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             ');
             
         break;//Fin caso 7    
+    
+        case 8://mostrar las imagenes del producto
+            
+            $idProducto=$obCon->normalizar($_REQUEST["idProducto"]);
+            $idLocal=$obCon->normalizar($_REQUEST["idLocal"]);
+            $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
+            
+            $sql="SELECT Ruta,Nombre,DescripcionLarga FROM productos_servicios_imagenes t1 
+                    INNER JOIN productos_servicios t2 ON t1.idProducto=t2.ID WHERE t1.idProducto='$idProducto' LIMIT 10";
+            
+            $Consulta=$obCon->QueryExterno($sql, HOST, USER, PW, $DatosLocal["db"], "");
+            $i=0;
+            while ($DatosConsulta=$obCon->FetchAssoc($Consulta)){
+                $DatosImagenes[$i]=$DatosConsulta;
+                $i=$i+1;
+            }
+            
+            print('<div id="demo" class="carousel slide" data-ride="carousel">
+                        <ul class="carousel-indicators">');
+            
+            foreach ($DatosImagenes as $key => $value) {
+                $class="";
+                if($key==0){
+                    $class='class="active"';
+                }
+                print('<li data-target="#demo" data-slide-to="'.$key.'" '.$class.'></li>');
+            }
+            print('   
+                        </ul>
+                        <div class="carousel-inner">');
+            foreach ($DatosImagenes as $key => $value) {
+                $class="";
+                if($key==0){
+                    $class='active';
+                }
+                $Ruta= str_replace("../", "", $value["Ruta"]);
+                $Ruta="../../".$Ruta;
+                print('<div class="carousel-item '.$class.'">
+                            <img src="'.$Ruta.'" alt="'.$value["Nombre"].'" style="width:100%;height:400px;" >
+                            <div class="carousel-caption" style="color:#41cb33;">
+                              <h1>'.$value["Nombre"].'</h1>
+                              <p><strong>'.$value["DescripcionLarga"].'</strong></p>
+                            </div>   
+                          </div>
+                          ');
+            }            
+            
+            print('       
+                        </div>
+                        <a class="carousel-control-prev" href="#demo" style="color:black;font-size:60px;" data-slide="prev">
+                          <span class="carousel-control-prev-icon mdi mdi-arrow-collapse-left"></span>
+                        </a>
+                        <a class="carousel-control-next" href="#demo" style="color:black;font-size:60px;" data-slide="next">
+                          <span class="carousel-control-next-icon mdi mdi-arrow-collapse-right"></span>
+                        </a>
+                      </div>');
+            
+        break;//Fin caso 8
         
  }
     
