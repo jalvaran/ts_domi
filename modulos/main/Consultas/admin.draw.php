@@ -21,6 +21,7 @@ if($Accion<>1){
 if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente a vacio 
     
     
+    
     switch($_REQUEST["Accion"]) {
        
         case 1://formulario para iniciar sesion
@@ -236,9 +237,11 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $Columnas[2]="<strong>Nombre</strong>";
             $Columnas[3]="<strong>Precio de Venta</strong>";
             $Columnas[4]="<strong>Descripcion</strong>";
-            $Acciones["ID"]["js"]="onclick=FormularioAgregarEditar(`2`,`@value`)";
-            $Acciones["ID"]["icon"]="mdi mdi-database-edit";
-            $Acciones["ID"]["style"]="style=font-size:20px;color:blue;cursor:pointer";
+            //$Acciones["ID"]["js"]="onclick=FormularioAgregarEditar(`2`,`@value`)";
+            //$Acciones["ID"]["icon"]="mdi mdi-database-edit";
+            //$Acciones["ID"]["style"]="style=font-size:20px;color:blue;cursor:pointer";
+            $Acciones["ID"]["html"]='<span class="mdi mdi-database-edit" style="font-size:20px;color:blue;cursor:pointer" onclick=FormularioAgregarEditar(`2`,`@value`)></span> || 
+                    <span class="mdi mdi-camera-plus" style="font-size:20px;color:green;cursor:pointer" onclick=FormularioAgregarImagenProducto(`@value`);Page=1;></span>';
             $htmlTabla=$css->getHtmlTable("<span class='mdi mdi-database-plus' style='font-size:40px;color:green;cursor:pointer' $js></span> <strong>$Titulo</strong>", $Columnas, $Filas,$Acciones);
             print($htmlTabla);
         break;//Fin canoso 4
@@ -678,6 +681,80 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             print($html);
             
         break;//Fin caso 9
+        
+        case 10://listado de imagenes de los productos
+            $Limit=20;
+            $idLocal=$obCon->normalizar($_SESSION["idLocal"]);
+            $idProducto=$obCon->normalizar($_REQUEST["idProducto"]);            
+            $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);            
+            $Page=$obCon->normalizar($_REQUEST["Page"]);
+            $Busqueda=$obCon->normalizar($_REQUEST["Busqueda"]);
+            
+            if($Page==''){
+                $Page=1;
+                
+            }
+            if($idProducto==''){
+                exit("No se recibió el id del producto");                
+            }
+            $Condicion=" WHERE ID<>'' ";
+            
+            if($Busqueda<>''){
+                $Condicion.=" AND (NombreArchivo like '%$Busqueda%' )";
+            }
+            
+            $PuntoInicio = ($Page * $Limit) - $Limit;
+            
+            $sql = "SELECT COUNT(t1.ID) as Items 
+                   FROM productos_servicios_imagenes t1 $Condicion;";
+            
+            $Consulta2=$obCon->QueryExterno($sql, HOST, USER, PW, $DatosLocal["db"], "");
+            $totales = $obCon->FetchAssoc($Consulta2);
+            $ResultadosTotales = $totales['Items'];
+            
+            if($ResultadosTotales>$Limit){
+                $TotalPaginas= ceil($ResultadosTotales/$Limit);
+                if($Page>1){
+                    $js="onclick=pageMinusAdmin();";
+                    $css->botonNavegacion($js, "green", "pageNav-pageBack-icon mdi mdi-arrow-left-bold", "PageMinus");
+                }
+                if($ResultadosTotales>($PuntoInicio+$Limit)){
+                    $js="onclick=pageAddAdmin();";
+                    $css->botonNavegacion($js, "green", "pageNav-pageForward-icon mdi mdi-arrow-right-bold", "PageAdd");
+                }
+            }
+            
+            $sql="SELECT ID,Ruta, NombreArchivo,Tamano FROM productos_servicios_imagenes $Condicion ORDER BY ID DESC LIMIT $PuntoInicio,$Limit;";
+            $Consulta=$obCon->QueryExterno($sql, HOST, USER, PW, $DatosLocal["db"], "");
+            $i=0;
+            $Filas[]="";
+            while($DatosClasificacion=$obCon->FetchAssoc($Consulta)){
+                $DatosClasificacion["Ruta"]= str_replace("../", "", $DatosClasificacion["Ruta"]);
+                $DatosClasificacion["Ruta"]="../../".$DatosClasificacion["Ruta"];
+                $Filas[$i]=$DatosClasificacion;
+                $i=$i+1;
+            }
+            $z=0;
+            $Titulo="IMAGENES";
+            $js="onclick=FormularioAgregarEditar(`2`)";
+            $Columnas[$z++]="<strong>Eliminar</strong>";
+           // $Columnas[$z++]="<strong>ID</strong>";
+            $Columnas[$z++]="<strong>Imagen</strong>";
+            $Columnas[$z++]="<strong>Nombre</strong>";
+            $Columnas[$z++]="<strong>Tamaño</strong>";
+            
+            $Acciones["ID"]["Visible"]=0;
+            $Acciones["Ruta"]["Visible"]=0;
+            //$Acciones["ID"]["js"]="onclick=FormularioAgregarEditar(`2`,`@value`)";
+            //$Acciones["ID"]["icon"]="mdi mdi-database-edit";
+            //$Acciones["ID"]["style"]="style=font-size:20px;color:blue;cursor:pointer";
+            $htmlInputFile=$css->getHtmlInput("file", "imgProducto", "imgProducto", "", "Imagen");
+            $htmlInputFile.="<br><br>".$css->getHtmlBoton(3, "btnSubir", "Subir", "Guardar", "onclick=ConfirmaGuardarEditar(`4`,`$idProducto`)");
+            $Acciones["ID"]["html"]='<span class="mdi mdi-database-remove" style="font-size:40px;color:red;cursor:pointer" onclick=EliminarFotoProducto(`@ID`)></span>';
+            $Acciones["Ruta"]["html"]='<a href="@value" target="_blank"><img src="@value" style="width:200px;"><img></a>';
+            $htmlTabla=$css->getHtmlTable("<strong>$Titulo</strong> <br><br>$htmlInputFile", $Columnas, $Filas,$Acciones);
+            print($htmlTabla);
+        break;//fin caso 10    
         
  }      
     

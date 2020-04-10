@@ -284,7 +284,7 @@ class PageConstruct extends html_estruct_class{
               </div>');
     }
     
-    public function divCardLocales($Fondo,$Title,$Content,$Footer,$icon,$ColorIcon,$js="",$style="",$Cols=3){
+    public function divCardLocales($link,$Fondo,$Title,$Content,$Footer,$icon,$ColorIcon,$js="",$style="",$Cols=3){
         
         print('<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop mdc-layout-grid__cell--span-'.$Cols.'-tablet" '.$js.' '.$style.'>
                 <div class="mdc-card info-card info-card--'.$ColorIcon.'">
@@ -305,6 +305,7 @@ class PageConstruct extends html_estruct_class{
                     <h5 class="card-title">'.$Title.'</h5>
                     <h5 class="font-weight-light pb-2 mb-1 border-bottom">'.$Content.'</h5>
                     <p class="tx-12 text" style="font-size:16px;color:black"><strong>'.$Footer.'</strong></p>
+                    '.$link.'     
                     <div class="card-icon-wrapper">
                       <i class="'.$icon.'"></i>
                     </div>
@@ -489,6 +490,13 @@ class PageConstruct extends html_estruct_class{
         </a>');
     }
     
+    public function miniChat($js,$id="aShoppingCAr",$idSp="spItemsCar",$idSpTotal="spTotalCar",$Color="#3fd21b") {
+        print('<a id="'.$id.'" class="chat-icon mdi mdi-chat" '.$js.' style="color:'.$Color.';">        
+            <span class="chat-icon-sp" id="'.$idSp.'">0</span> 
+                
+        </a>');
+    }
+    
     public function botonNavegacion($js,$Color,$class,$id="") {
         print('<a id="'.$id.'" class="'.$class.'" '.$js.' style="color:'.$Color.';">             
         </a>');
@@ -583,9 +591,7 @@ class PageConstruct extends html_estruct_class{
             foreach ($Filas as $DatosItems) {
                 $html.='<tr >';
                 foreach ($DatosItems as $key => $value) {
-                    if(isset($Acciones[$key]["Visible"]) AND $Acciones[$key]["Visible"]==0){
-                        continue;
-                    }
+                    
                     if(isset($Acciones[$key]["js"])){
                         $jsIcon= str_replace("@value", $value, $Acciones[$key]["js"]);
                         $html.='<td class="text-left"><span class="'.$Acciones[$key]["icon"].'" '.$Acciones[$key]["style"].' '.$jsIcon.'></span></td>';
@@ -594,6 +600,9 @@ class PageConstruct extends html_estruct_class{
                         $htmlCol= str_replace("@value", $value, $Acciones[$key]["html"]);
                         $htmlCol= str_replace("@ID", $DatosItems["ID"], $htmlCol);
                         $html.='<td class="text-left">'.$htmlCol.'</td>';
+                    }
+                    if(isset($Acciones[$key]["Visible"]) AND $Acciones[$key]["Visible"]==0){
+                        continue;
                     }
                     $html.='<td class="text-left">'.$value.'</td>';
                     

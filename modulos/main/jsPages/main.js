@@ -612,8 +612,33 @@ function BuscarLocal(){
       });
 }
 
+function MostrarLinksEnlaces(){
+    
+    if($("#aLinkProducto").length){
+        $("#aLinkLocal").click();
+        $("#aLinkProducto").click();
+        return;
+    }
+    
+    if($("#aLinkLocal").length){        
+        $("#aLinkLocal").click();
+    }
+    
+}
+
+function CopiarLinkLocal(idElemento){
+    idElemento="#"+idElemento;
+    var $temp = $("<input>");
+    $("body").append($temp);
+    $temp.val($(idElemento).text()).select();
+    document.execCommand("copy");
+    alertify.success("Link Copiado: "+$(idElemento).text());
+    $temp.remove();
+}
+
+
 ListarCategoria();
-
-
+MostrarLinksEnlaces();
 ActualizarTotalItemsCarro(idClientUser);
+
 

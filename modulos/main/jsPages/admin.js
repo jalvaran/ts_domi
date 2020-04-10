@@ -5,7 +5,7 @@
  */
 
 var idMenuAdmin=1;
-
+var lastProduct="";
 function VerMenuSegunID(){
     if(idMenuAdmin==1){
         adminClasificacion();
@@ -18,6 +18,9 @@ function VerMenuSegunID(){
     }
     if(idMenuAdmin==4){
         adminLocales();
+    }
+    if(idMenuAdmin==5){
+        FormularioAgregarImagenProducto(lastProduct);
     }
 }
 function pageMinusAdmin(){
@@ -378,6 +381,9 @@ function ConfirmaGuardarEditar(Tabla,idItem){
                 if(Tabla==3){
                     GuardarEditarLocal(idItem);
                 }
+                if(Tabla==4){
+                    GuardarFotoProducto(idItem);
+                }
                 
             }else{
                 alertify.error("Se canceló el proceso");
@@ -566,6 +572,88 @@ function GuardarEditarLocal(idItem){
                 if(idItem==''){
                     ConfirmarMigracion();
                 }
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
+            }else{
+                alertify.alert(data);                
+            }
+                    
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+     
+}
+
+
+function FormularioAgregarImagenProducto(idProducto){
+    lastProduct=idProducto;
+    idMenuAdmin=5;
+    var idDiv="divAdmin";
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
+    var Busqueda=document.getElementById('BusquedaAdmin').value;
+    var FiltroEstado=document.getElementById('cmbSelectFiltroPedidos').value;
+    var form_data = new FormData();
+        form_data.append('Accion', 10);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+        form_data.append('Token_user', idClientUser);
+        form_data.append('Busqueda', Busqueda);
+        form_data.append('idProducto', idProducto);
+        form_data.append('FiltroEstado', FiltroEstado);
+        form_data.append('Page', Page);
+        
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/admin.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){   
+            
+            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+            initForm();
+            
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            document.getElementById(idDiv).innerHTML="hay un problema!";
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+
+function GuardarFotoProducto(idProducto){
+    
+    var form_data = new FormData();
+       
+        form_data.append('Accion', '7'); 
+        form_data.append('Token_user', idClientUser);
+        form_data.append('idProducto', idProducto);        
+        form_data.append('imgProducto', $('#imgProducto').prop('files')[0]);
+        
+                              
+        $.ajax({
+        url: './procesadores/admin.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){ 
+                alertify.success(respuestas[1]);                
+                VerMenuSegunID(); 
+                
             }else if(respuestas[0]=="E1"){  
                 alertify.error(respuestas[1]);
                 MarqueErrorElemento(respuestas[2]);

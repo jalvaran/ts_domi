@@ -9,7 +9,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
     
     $css =  new PageConstruct("", "", 1, "", 1, 0);// se instancia para poder utilizar el html
     $obCon = new Domi(1);// se instancia para poder conectarse con la base de datos 
-    
+        
     switch($_REQUEST["Accion"]) {
        
         case 1://Listar las categorias
@@ -32,6 +32,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $idCategoria=$obCon->normalizar($_REQUEST["Categoria"]);
             $sql="SELECT * FROM locales WHERE idCategoria='$idCategoria' AND Estado=1 ORDER BY Orden ASC";
             $Consulta=$obCon->Query($sql);
+            $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 2004); //Se aloja la ruta del enlace
             while($DatosCategorias=$obCon->FetchAssoc($Consulta)){
                 $idItem=$DatosCategorias["ID"];
                 $js="onclick=DibujaLocal(`$idItem`)";
@@ -42,7 +43,13 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                     $RutaImagen="../../".$RutaImagen;
                     
                 }
-                $css->divCardLocales($RutaImagen,($DatosCategorias["Nombre"]), ($DatosCategorias["Descripcion"]), ($DatosCategorias["Telefono"]."<br>".$DatosCategorias["Direccion"]), $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
+                
+                $LinkLocal=$Configuracion["Valor"].$idItem;
+                $idLinkLocal="linkLocal_".$idItem;
+                $link='<span id="'.$idLinkLocal.'" type="hidden" style="display:none;">'.$LinkLocal.'</span>
+                        <span class="mdi mdi-link-variant-plus" onclick="CopiarLinkLocal(`'.$idLinkLocal.'`)"> Copiar Link</span>
+                         ';
+                $css->divCardLocales($link,$RutaImagen,($DatosCategorias["Nombre"]), ($DatosCategorias["Descripcion"]), ($DatosCategorias["Telefono"]."<br>".$DatosCategorias["Direccion"]), $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
 
             }
             
@@ -68,7 +75,13 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 $values["values"][$i]=$DatosConsulta["ID"];       $values["text"][$i]=$DatosConsulta["Clasificacion"];
                 $i=$i+1;
             }
-            $css->divCardLocales($RutaImagen,($DatosLocal["Nombre"]), ($DatosLocal["Descripcion"]), ($DatosLocal["Telefono"]."<br>".$DatosLocal["Direccion"]), $DatosLocal["Icono"], $DatosLocal["ColorIcono"],$js,"style=cursor:pointer",12);       
+            $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 2004); //Se aloja la ruta del enlace
+            $LinkLocal=$Configuracion["Valor"].$idLocal;
+            $idLinkLocal="linkLocal_".$idLocal;
+            $link='<span id="'.$idLinkLocal.'" type="hidden" style="display:none;">'.$LinkLocal.'</span>
+                    <span class="mdi mdi-link-variant-plus" onclick="CopiarLinkLocal(`'.$idLinkLocal.'`)"> Copiar Link</span>
+                     ';
+            $css->divCardLocales($link,$RutaImagen,($DatosLocal["Nombre"]), ($DatosLocal["Descripcion"]), ($DatosLocal["Telefono"]."<br>".$DatosLocal["Direccion"]), $DatosLocal["Icono"], $DatosLocal["ColorIcono"],$js,"style=cursor:pointer",12);       
             
             $style="style='width:130%;'";
             $js="onchange=ListarProductos(`$idLocal`);Page=1;"; 
@@ -290,15 +303,26 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $Busqueda=$obCon->normalizar($_REQUEST["Busqueda"]);
             $sql="SELECT * FROM locales WHERE Nombre LIKE '%$Busqueda%' AND Estado=1 ORDER BY Orden ASC LIMIT 50";
             $Consulta=$obCon->Query($sql);
+            $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 2004); //Se aloja la ruta del enlace
             while($DatosCategorias=$obCon->FetchAssoc($Consulta)){
                 $idItem=$DatosCategorias["ID"];
                 $js="onclick=DibujaLocal(`$idItem`)";
-                $Fondo="../../images/image.webp";
+                $RutaImagen="../../images/image.webp";
                 $DatosFondo=$obCon->DevuelveValores("locales_imagenes", "idLocal", $idItem);
                 if($DatosFondo["ID"]<>''){
-                    $Fondo=$DatosFondo["Ruta"];
+                    $RutaImagen=$DatosFondo["Ruta"];                    
+                    $RutaImagen= str_replace("../", "", $DatosFondo["Ruta"]);
+                    $RutaImagen="../../".$RutaImagen;
+                    
+                
                 }
-                $css->divCardLocales($Fondo,($DatosCategorias["Nombre"]), ($DatosCategorias["Descripcion"]), ($DatosCategorias["Telefono"]."<br>".$DatosCategorias["Direccion"]), $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
+                
+                $LinkLocal=$Configuracion["Valor"].$idItem;
+                $idLinkLocal="linkLocal_".$idItem;
+                $link='<span id="'.$idLinkLocal.'" type="hidden" style="display:none;">'.$LinkLocal.'</span>
+                        <span class="mdi mdi-link-variant-plus" onclick="CopiarLinkLocal(`'.$idLinkLocal.'`)"> Copiar Link</span>
+                         ';
+                $css->divCardLocales($link,$RutaImagen,($DatosCategorias["Nombre"]), ($DatosCategorias["Descripcion"]), ($DatosCategorias["Telefono"]."<br>".$DatosCategorias["Direccion"]), $DatosCategorias["Icono"], $DatosCategorias["ColorIcono"],$js,"style=cursor:pointer");       
 
             }
             

@@ -290,7 +290,52 @@ if( !empty($_REQUEST["Accion"]) ){
             
             print("OK;Registro Guardado Correctamente;$idEditar");
             
-        break;//Fin caso 6    
+        break;//Fin caso 6  
+        
+        case 7://Guardar la foto de un producto
+            $Token=$obCon->normalizar($_REQUEST["Token_user"]);
+            $DatosSesion=$obCon->VerificaSesion($Token);
+            if($DatosSesion["Estado"]=="E1"){               
+                exit($DatosSesion["Estado"].";".$DatosSesion["Mensaje"]);
+            }
+            $idLocal=$obCon->normalizar($_SESSION["idLocal"]);
+            $idProducto=$obCon->normalizar($_REQUEST["idProducto"]);
+            $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
+            $Extension="";
+            if(!empty($_FILES['imgProducto']['name'])){
+                
+                $info = new SplFileInfo($_FILES['imgProducto']['name']);
+                $Extension=($info->getExtension()); 
+                if($Extension<>'jpg' and $Extension<>'png' and $Extension<>'jpeg'){
+                    exit("E1;Solo se permiten imagenes;imgProducto");
+                }
+                $Tamano=filesize($_FILES['imgProducto']['tmp_name']);
+                $DatosConfiguracion=$obCon->DevuelveValores("configuracion_general", "ID", 2001);
+                
+                $carpeta=$DatosConfiguracion["Valor"];
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                $carpeta=$DatosConfiguracion["Valor"].$idLocal."/";
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                $carpeta=$DatosConfiguracion["Valor"].$idLocal."/".$idProducto."/";
+                if (!file_exists($carpeta)) {
+                    mkdir($carpeta, 0777);
+                }
+                
+                opendir($carpeta);
+                $idAdjunto=uniqid(true);
+                $destino=$carpeta.$idAdjunto.".".$Extension;
+                
+                move_uploaded_file($_FILES['imgProducto']['tmp_name'],$destino);
+                $obCon->RegistreImagenProducto($DatosLocal["db"],$idProducto, $destino, $Tamano, $_FILES['imgProducto']['name'], $Extension, 1);
+            }else{
+                exit("E1;No se recibió la imagen;imgProducto");
+            }
+            print("OK;Imagen agregada");
+        break;//fin caso 7    
         
     }
           
