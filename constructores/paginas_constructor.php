@@ -288,18 +288,11 @@ class PageConstruct extends html_estruct_class{
         
         print('<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop mdc-layout-grid__cell--span-'.$Cols.'-tablet" '.$js.' '.$style.'>
                 <div class="mdc-card info-card info-card--'.$ColorIcon.'">
-                  <div class="card-inner" style="background-image:url('.$Fondo.');background-repeat: no-repeat;background-size: 300px 90%;">
+                  <div class="card-inner" style="">
+                    <img src="'.$Fondo.'" style="width: 90%;height:200px;"></img>
                     <br>
                     <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
+                    
                   </div>
                   <div class="card-inner">
                     <h5 class="card-title">'.$Title.'</h5>
@@ -497,8 +490,8 @@ class PageConstruct extends html_estruct_class{
         </a>');
     }
     
-    public function botonNavegacion($js,$Color,$class,$id="") {
-        print('<a id="'.$id.'" class="'.$class.'" '.$js.' style="color:'.$Color.';">             
+    public function botonNavegacion($js,$Color,$class,$id="",$moreStyles="") {
+        print('<a id="'.$id.'" class="'.$class.'" '.$js.' style="color:'.$Color.';'.$moreStyles.'">             
         </a>');
     }
     

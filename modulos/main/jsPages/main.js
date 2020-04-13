@@ -336,6 +336,7 @@ function VerCarrito(){
         success: function(data){            
             document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
             initForm();
+            //AutocomplementarDatosCliente();
         },
         error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
             document.getElementById(idDiv).innerHTML="hay un problema!";
@@ -668,6 +669,52 @@ function CopiarLinkLocal(idElemento){
     $temp.remove();
 }
 
+function AutocomplementarDatosCliente(){
+    
+    if(!$("#NombreCliente").length){
+        return;
+    }
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '7'); 
+        
+        form_data.append('idUserClient', idClientUser);
+                        
+        $.ajax({
+        url: './procesadores/main.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){ 
+                $("#NombreCliente").click();
+                $("#DireccionCliente").click();
+                $("#Telefono").focus();
+                //document.getElementById('NombreCliente').focus();
+                //document.getElementById('DireccionCliente').focus();
+                //document.getElementById('Telefono').focus();
+                document.getElementById('NombreCliente').value=respuestas[1];
+                document.getElementById('DireccionCliente').value=respuestas[2];
+                document.getElementById('Telefono').value=respuestas[3];
+                
+                
+               
+            }else{
+                console.log(respuestas);
+            }              
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
 
 ListarCategoria();
 MostrarLinksEnlaces();

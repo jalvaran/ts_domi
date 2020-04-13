@@ -640,6 +640,12 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $html.=$css->getHtmlInput("text", "Telefono", "Telefono", $DatosActuales["Telefono"], "Telefono", "", "", "", 1);
             $html.="</div>";
             $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("text", "Propietario", "Propietario", $DatosActuales["Propietario"], "Propietario", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
+            $html.=$css->getHtmlInput("number", "Tarifa", "Tarifa", $DatosActuales["Tarifa"], "Tarifa", "", "", "", 1);
+            $html.="</div>";
+            $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';
             $html.=$css->getHtmlInput("email", "Email", "Email", $DatosActuales["Email"], "Email", "", "", "", 1);
             $html.="</div>";     
             $html.='<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop">';

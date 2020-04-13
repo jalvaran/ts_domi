@@ -17,7 +17,7 @@ $obCon = new conexion(1); //instancia para Conexion a la base de datos
 
 $css->ShoppingCar("onclick=VerCarrito();");
 //$css->miniChat("onclick=VerChat();");
-$css->botonNavegacion("onclick=ListarCategoria()", "black", "pageNav-home-icon mdi mdi-home");
+$css->botonNavegacion("onclick=ListarCategoria()", "#246ce1", "pageNav-home-icon mdi mdi-home","","");
 $css->botonNavegacion("onclick=ListarAnterior()", "black", "pageNav-back-icon mdi mdi-skip-backward");
 $css->botonNavegacion("onclick=ListarSiguiente()", "black", "pageNav-forward-icon mdi mdi-skip-forward");
 $css->modal("modalMain", "DOMI", "DivModal");

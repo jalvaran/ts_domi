@@ -182,6 +182,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $Datos["Nombre"]=$obCon->normalizar($_REQUEST["Nombre"]);
             $Datos["Direccion"]=$obCon->normalizar($_REQUEST["Direccion"]);
             $Datos["Telefono"]=$obCon->normalizar($_REQUEST["Telefono"]);
+            $Datos["Propietario"]=$obCon->normalizar($_REQUEST["Propietario"]);
+            $Datos["Tarifa"]=$obCon->normalizar($_REQUEST["Tarifa"]);
             $Datos["Email"]=$obCon->normalizar($_REQUEST["Email"]);
             $Datos["Password"]=$obCon->normalizar($_REQUEST["Password"]);
             $Datos["Descripcion"]=$obCon->normalizar($_REQUEST["Descripcion"]);
@@ -335,7 +337,39 @@ if( !empty($_REQUEST["Accion"]) ){
                 exit("E1;No se recibió la imagen;imgProducto");
             }
             print("OK;Imagen agregada");
-        break;//fin caso 7    
+        break;//fin caso 7   
+        
+        case 8://Elimina una foto de un producto
+            $idItem=$obCon->normalizar($_REQUEST["idItem"]);
+            $idEditar=$idItem;
+            
+            $Token=$obCon->normalizar($_REQUEST["Token_user"]);
+            $DatosSesion=$obCon->VerificaSesion($Token);
+            if($DatosSesion["Estado"]=="E1"){               
+                exit($DatosSesion["Estado"].";".$DatosSesion["Mensaje"]);
+            }
+            
+                        
+            $idLocal=$_SESSION["idLocal"];
+            $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
+            $DatosServidor["IP"]=HOST;
+            $DatosServidor["Usuario"]=USER;
+            $DatosServidor["Password"]=PW;
+            $DatosServidor["DataBase"]=$DatosLocal["db"];
+            
+            
+            $sql="SELECT Ruta FROM productos_servicios_imagenes WHERE ID='$idItem' LIMIT 1";
+            $Consulta=$obCon->QueryExterno($sql, $DatosServidor["IP"], $DatosServidor["Usuario"], $DatosServidor["Password"], $DatosServidor["DataBase"], "");
+            $DatosValidacion=$obCon->FetchAssoc($Consulta);
+            if (file_exists($DatosValidacion["Ruta"])) {
+                unlink($DatosValidacion["Ruta"]);
+            }
+            $sql="DELETE FROM productos_servicios_imagenes WHERE ID='$idItem'";
+            $obCon->QueryExterno($sql, $DatosServidor["IP"], $DatosServidor["Usuario"], $DatosServidor["Password"], $DatosServidor["DataBase"], "");
+                
+            print("OK;Registro Guardado Correctamente;$idEditar");
+            
+        break;//Fin caso 8
         
     }
           

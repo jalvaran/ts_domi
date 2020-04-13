@@ -1,4 +1,10 @@
 
+@keyframes latidos {
+    from { transform: none; }
+    50% { transform: scale(1.4); }
+    to { transform: none; }
+}
+
 .pageNav {
   position: absolute;
   width: auto;
@@ -15,11 +21,18 @@
   position: fixed;
   cursor:pointer;
   z-index: 2;
-  bottom: 2%;
-  left: 44%;
-  height: 50px;
-  width: 50px;
-  font-size:50px;
+  bottom: 5%;
+  left: 38%;
+  height: 100px;
+  width: 100px;
+  font-size:100px;  
+  
+  display: inline-block;	
+    text-shadow: 0 0 10px #222,1px 1px  0 #450505;
+    color: red;
+    animation: latidos 2s infinite;
+    transform-origin: center;
+  
   
 }
 

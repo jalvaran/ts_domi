@@ -138,7 +138,6 @@ if( !empty($_REQUEST["Accion"]) ){
             $obCon->Query2($sql, HOST, USER, PW, $dbLocal, "");
             
             $obCon->ActualizarValoresPedido($idLocalEdit, $DatosPedido["pedido_id"]);
-          
             
             print("OK;Item Eliminado");
         break;//Fin caso 4
@@ -255,6 +254,21 @@ if( !empty($_REQUEST["Accion"]) ){
             
             print("OK;Tu Pedido fué descartado");
         break;//Fin caso 6
+        
+        case 7://Autocomplementar datos cliente
+            $idUserClient=$obCon->normalizar($_REQUEST["idUserClient"]);  
+            
+            if($idUserClient==""){
+                exit("E1;No se recibió el id del cliente");
+            }
+            
+           
+            $sql="SELECT Nombre,Telefono,Direccion FROM client_user WHERE ID='$idUserClient'";
+            $Consulta=$obCon->Query($sql);
+            $DatosCliente=$obCon->FetchAssoc($Consulta);
+            
+            print("OK;".$DatosCliente["Nombre"].";".$DatosCliente["Telefono"].";".$DatosCliente["Direccion"]);
+        break;//Fin caso 7
         
         
     }

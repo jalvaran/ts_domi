@@ -531,6 +531,8 @@ function GuardarEditarLocal(idItem){
     var Nombre=document.getElementById('Nombre').value;
     var Direccion=document.getElementById('Direccion').value;
     var Telefono=document.getElementById('Telefono').value;
+    var Propietario=document.getElementById('Propietario').value;
+    var Tarifa=document.getElementById('Tarifa').value;
     var Email=document.getElementById('Email').value;
     var Password=document.getElementById('Password').value;
     var Descripcion=document.getElementById('Descripcion').value;
@@ -547,6 +549,8 @@ function GuardarEditarLocal(idItem){
         form_data.append('Nombre', Nombre);
         form_data.append('Direccion', Direccion);
         form_data.append('Telefono', Telefono);
+        form_data.append('Propietario', Propietario);
+        form_data.append('Tarifa', Tarifa);
         form_data.append('Email', Email);
         form_data.append('Password', Password);
         form_data.append('Descripcion', Descripcion);
@@ -639,6 +643,47 @@ function GuardarFotoProducto(idProducto){
         form_data.append('imgProducto', $('#imgProducto').prop('files')[0]);
         
                               
+        $.ajax({
+        url: './procesadores/admin.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){ 
+                alertify.success(respuestas[1]);                
+                VerMenuSegunID(); 
+                
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
+            }else{
+                alertify.alert(data);                
+            }
+                    
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+     
+}
+
+
+function EliminarFotoProducto(idItem){
+    
+    var form_data = new FormData();
+       
+        form_data.append('Accion', '8'); 
+        form_data.append('Token_user', idClientUser);
+        form_data.append('idItem', idItem);        
+                             
         $.ajax({
         url: './procesadores/admin.process.php',
         //dataType: 'json',
