@@ -185,11 +185,37 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
         break;//Fin canoso 3
         
         case 4://Dibuja el listado de los productos
+            
             $Limit=20;
             $idLocal=$obCon->normalizar($_SESSION["idLocal"]);            
             $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);            
             $Page=$obCon->normalizar($_REQUEST["Page"]);
             $Busqueda=$obCon->normalizar($_REQUEST["Busqueda"]);
+            
+            print("<h3>Agregar Producto</h3>");
+            
+            $css->select("idClasificacion", "form-control", "idClasificacion", "", "", "", "");
+                $css->option("", "", "", "", "", "");
+                    print("Seleccione una Clasificacion");
+                $css->Coption();
+                $sql="SELECT * FROM inventarios_clasificacion";
+                $ConsultaClasificacion=$obCon->QueryExterno($sql, HOST, USER, PW, $DatosLocal["db"], "");
+                while($DatosConsultaClasificacion=$obCon->FetchAssoc($ConsultaClasificacion)){
+                    $css->option("", "", "", $DatosConsultaClasificacion["ID"], "", "");
+                        print($DatosConsultaClasificacion["Clasificacion"]);
+                    $css->Coption();
+                }
+            $css->Cselect();
+            print("<hr>");
+            $css->input("text", "Nombre", "form-control", "Nombre", "", "", "Nombre", "off", "", "", "");
+            print("<hr>");
+            $css->input("number", "PrecioVenta", "form-control", "PrecioVenta", "", "", "PrecioVenta", "off", "", "", "");
+            print("<hr>");
+            print('<input type="file" class="form-control"  name="images[]" id="imgsProducto" multiple>');
+            print("<hr>");
+            $htmlBoton=$css->getHtmlBoton(1, "btnGuardarProducto", "btnGuardarProducto", "Agregar", "onclick=GuardarProductoRapido()");
+            print($htmlBoton);
+            
             
             if($Page==''){
                 $Page=1;

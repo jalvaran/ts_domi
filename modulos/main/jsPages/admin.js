@@ -715,3 +715,62 @@ function EliminarFotoProducto(idItem){
       });
      
 }
+
+
+function GuardarProductoRapido(){
+    
+    var idBoton='btnGuardarProducto';
+    document.getElementById(idBoton).disabled=true;
+    document.getElementById(idBoton).value="Guardando...";
+    var idClasificacion=document.getElementById("idClasificacion").value;    
+    var Nombre=document.getElementById("Nombre").value;
+    var PrecioVenta=document.getElementById("PrecioVenta").value;
+        
+    var form_data = new FormData();
+        form_data.append('Accion', '9'); 
+        form_data.append('Token_user', idClientUser);
+        
+        form_data.append('idClasificacion', idClasificacion); 
+        
+        form_data.append('Nombre', Nombre);
+        form_data.append('PrecioVenta', PrecioVenta);
+        var totalfiles = document.getElementById('imgsProducto').files.length;
+        for(i = 0; i < totalfiles; i++){ 
+            form_data.append('ImagenProducto[]', document.getElementById('imgsProducto').files[i]);
+            
+        }
+        
+        $.ajax({
+        url: './procesadores/admin.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            document.getElementById(idBoton).disabled=false;
+            document.getElementById(idBoton).value="Agregar";
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){ 
+                alertify.success(respuestas[1]);                
+                VerMenuSegunID();                      
+                
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
+            }else{
+                alertify.alert(data);                
+            }
+                    
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;
+            document.getElementById(idBoton).value="Agregar";
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+     
+}

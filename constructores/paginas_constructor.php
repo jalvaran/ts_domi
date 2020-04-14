@@ -284,12 +284,15 @@ class PageConstruct extends html_estruct_class{
               </div>');
     }
     
-    public function divCardLocales($link,$Fondo,$Title,$Content,$Footer,$icon,$ColorIcon,$js="",$style="",$Cols=3){
-        
+    public function divCardLocales($link,$Fondo,$Title,$Content,$Footer,$icon,$ColorIcon,$js="",$style="",$Cols=3,$ImgCompleta=0){
+        $Altura="200px%";
+        if($ImgCompleta==1){
+            $Altura="90%";
+        }
         print('<div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-'.$Cols.'-desktop mdc-layout-grid__cell--span-'.$Cols.'-tablet" '.$js.' '.$style.'>
                 <div class="mdc-card info-card info-card--'.$ColorIcon.'">
                   <div class="card-inner" style="">
-                    <img src="'.$Fondo.'" style="width: 90%;height:200px;"></img>
+                    <img src="'.$Fondo.'" style="width: 90%;height:'.$Altura.';"></img>
                     <br>
                     <br>
                     

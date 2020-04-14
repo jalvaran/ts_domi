@@ -371,6 +371,91 @@ if( !empty($_REQUEST["Accion"]) ){
             
         break;//Fin caso 8
         
+        case 9://Recibe la creacion de un producto en formato rapido y con multiples imagenes
+            
+            $idItem='';
+            $Datos["Estado"]=1;
+            $Datos["idClasificacion"]=$obCon->normalizar($_REQUEST["idClasificacion"]);
+            $Datos["Referencia"]=$obCon->getUniqId();
+            $Datos["Nombre"]=$obCon->normalizar($_REQUEST["Nombre"]);
+            $Datos["PrecioVenta"]=$obCon->normalizar($_REQUEST["PrecioVenta"]);            
+            $Datos["Orden"]=1;
+            foreach ($Datos as $key => $value) {
+                if($value==""){
+                    exit("E1;El campo $key no puede estar vacío;$key");
+                }
+            }
+            
+            if(!is_numeric($Datos["PrecioVenta"]) or $Datos["PrecioVenta"]<0){
+                exit("E1;El campo Orden Debe ser un numero mayor o igual a cero;PrecioVenta");
+            }
+            $Token=$obCon->normalizar($_REQUEST["Token_user"]);
+            $DatosSesion=$obCon->VerificaSesion($Token);
+            if($DatosSesion["Estado"]=="E1"){               
+                exit($DatosSesion["Estado"].";".$DatosSesion["Mensaje"]);
+            }
+            if(!isset($_FILES['ImagenProducto']['name'])){
+                exit("E1;Debe Adjuntar una Imagen para el Producto;imgsProducto");
+            }
+            foreach ($_FILES['ImagenProducto']['name'] as $key => $NombreArchivo) {
+                if(empty($NombreArchivo)){
+                    exit("E1;Debe Adjuntar una Imagen para el Producto;imgsProducto");
+                }else{
+                    $info = new SplFileInfo($NombreArchivo);
+                    $Extension=($info->getExtension());  
+                    if($Extension<>'jpg' and $Extension<>'png' and $Extension<>'jpeg' and $Extension<>'webp'){
+                        exit("E1;Solo se permiten imagenes;imgsProducto");
+                    }
+                } 
+            }
+                            
+            
+            $idLocal=$_SESSION["idLocal"];
+            $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
+            $Tabla="productos_servicios";
+            
+            $Datos["ID"]=$obCon->getUniqId();
+            $idProducto=$Datos["ID"];
+            $Datos["Created"]=date("Y-m-d H:i:s");
+            $sql=$obCon->getSQLInsert($Tabla, $Datos);            
+            $obCon->QueryExterno($sql, HOST, USER, PW, $DatosLocal["db"], "");
+            
+            foreach ($_FILES['ImagenProducto']["name"] as $key => $NombreArchivo) {
+                
+                $Extension="";
+                if(!empty($NombreArchivo)){
+                    
+                    $info = new SplFileInfo($_FILES['ImagenProducto']["name"][$key]);
+                    $Extension=($info->getExtension()); 
+                    
+                    $Tamano=filesize($_FILES['ImagenProducto']['tmp_name'][$key]);
+                    $DatosConfiguracion=$obCon->DevuelveValores("configuracion_general", "ID", 2001);
+
+                    $carpeta=$DatosConfiguracion["Valor"];
+                    if (!file_exists($carpeta)) {
+                        mkdir($carpeta, 0777);
+                    }
+                    $carpeta=$DatosConfiguracion["Valor"].$idLocal."/";
+                    if (!file_exists($carpeta)) {
+                        mkdir($carpeta, 0777);
+                    }
+                    $carpeta=$DatosConfiguracion["Valor"].$idLocal."/".$idProducto."/";
+                    if (!file_exists($carpeta)) {
+                        mkdir($carpeta, 0777);
+                    }
+
+                    opendir($carpeta);
+                    $idAdjunto=uniqid(true);
+                    $destino=$carpeta.$idAdjunto.".".$Extension;
+
+                    move_uploaded_file($_FILES['ImagenProducto']['tmp_name'][$key],$destino);
+                    $obCon->RegistreImagenProducto($DatosLocal["db"],$idProducto, $destino, $Tamano, $_FILES['ImagenProducto']['name'][$key], $Extension, 1);
+                }
+            }
+            print("OK;Registro Guardado");
+            
+        break;//Fin caso 9    
+        
     }
           
 }else{

@@ -81,7 +81,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $link='<span id="'.$idLinkLocal.'" type="hidden" style="display:none;">'.$LinkLocal.'</span>
                     <span class="mdi mdi-link-variant-plus" onclick="CopiarLinkLocal(`'.$idLinkLocal.'`)"> Copiar Link</span>
                      ';
-            $css->divCardLocales($link,$RutaImagen,($DatosLocal["Nombre"]), ($DatosLocal["Descripcion"]), ($DatosLocal["Telefono"]."<br>".$DatosLocal["Direccion"]), $DatosLocal["Icono"], $DatosLocal["ColorIcono"],$js,"style=cursor:pointer",12);       
+            $css->divCardLocales($link,$RutaImagen,($DatosLocal["Nombre"]), ($DatosLocal["Descripcion"]), ($DatosLocal["Telefono"]."<br>".$DatosLocal["Direccion"]), $DatosLocal["Icono"], $DatosLocal["ColorIcono"],$js,"style=cursor:pointer",12,1);       
             
             $style="style='width:130%;'";
             $js="onchange=ListarProductos(`$idLocal`);Page=1;"; 
