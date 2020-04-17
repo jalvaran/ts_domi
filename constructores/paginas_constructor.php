@@ -109,7 +109,7 @@ class PageConstruct extends html_estruct_class{
         print('<header class="mdc-top-app-bar">
         <div class="mdc-top-app-bar__row">
           <div class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-            <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button sidebar-toggler">menu</button>
+            <button id="btnVerticalMenu" class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button sidebar-toggler">menu</button>
             <span class="mdc-top-app-bar__title">'.$Titulo.'</span>
             <div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-leading-icon search-text-field  d-md-flex">
               <i class="material-icons mdc-text-field__icon">b</i>
@@ -180,7 +180,7 @@ class PageConstruct extends html_estruct_class{
         //$NombreUsuario= utf8_encode($_SESSION["nombre"]);
         //$idUser=$_SESSION["idUser"];
         $this->BarraLateralIni($myTitulo,"",""); 
-            $this->MenuLateral(" Administrar ", "index.php", "onclick=FormularioIniciarSesion();");
+            $this->MenuLateral(" Administrar ", "index.php", "onclick=FormularioIniciarSesion();document.getElementById('btnVerticalMenu').click()");
         $this->BarraLateralFin();    
         $this->MainWraper();
             $this->Cabecera($myTitulo);

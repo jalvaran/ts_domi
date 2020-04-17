@@ -1,7 +1,7 @@
 <?php
 
 include_once("../clases/main.class.php");
-
+include_once("../../../general/clases/telegram.class.php");
 if(file_exists("../../../general/clases/mail.class.php")){
     include_once("../../../general/clases/mail.class.php");
 }
@@ -170,12 +170,17 @@ if( !empty($_REQUEST["Accion"]) ){
             }
             
             $obCon->ActualiceDatosCliente($idUserClient, $NombreCliente, $DireccionCliente, $Telefono);
-            $sql="SELECT t1.Created,t1.ID,t1.local_id,t2.Email,t2.Nombre FROM pedidos t1 INNER JOIN locales t2 ON t1.local_id=t2.ID
+            $obTel=new TS_Telegram($idUser);
+            
+            $Cliente=" $NombreCliente, $DireccionCliente, $Telefono ";
+            
+            $sql="SELECT t1.Created,t1.ID,t1.local_id,t2.Email,t2.Nombre,t2.idTelegram FROM pedidos t1 INNER JOIN locales t2 ON t1.local_id=t2.ID
                      WHERE cliente_id='$idUserClient' AND t1.Estado=1";
             $Consulta=$obCon->Query($sql);
             $MailReport[]="";
             $htmlMensaje="";
-            $Ruta=$obCon->DevuelveValores("configuracion_general", "ID", 2003);//Ruta del pdf para ver el pedido
+            //$TelegramToken=$obCon->DevuelveValores("configuracion_general", "ID", 2005);//Token api telegram
+            $Ruta=$obCon->DevuelveValores("configuracion_general", "ID", 2006);//Ruta del pdf para ver el pedido
             
             $htmlMensaje='<div class="table-responsive"><h2><strong>Tienes nuevos Pedidos de la Plataforma DoMi!</strong></h2></div>';
             $htmlMensaje.='<table class="table"><tr><th><strong>LISTA DE PEDIDOS:</strong></th></tr>';
@@ -208,10 +213,17 @@ if( !empty($_REQUEST["Accion"]) ){
                 
                 $htmlMensaje.='<tr>
                                 
-                                <th><a href="'.$Link.'" target="_blank">VER PDF</th>
+                                <th><a href="'.$Link.'" target="_blank">VER PDF</a></th>
                             </tr>';
                 
                 $i=$i+1;
+                
+                if($DatosConsulta["idTelegram"]<>''){
+                    $Enlace='<a href="'.$Link.'" target="_blank">VER PDF</a>';
+                    $msg="Tienes un Nuevo pedido en la plataforma Domi, para $Cliente, $Enlace";
+                    $obTel->EnviarMensajeTelegram($DatosConsulta["idTelegram"], $msg);
+                }
+                
             }
             $htmlMensaje.="</table>";
             $sql="UPDATE pedidos SET Estado=2,Observaciones='$ObservacionesPedido' WHERE cliente_id='$idUserClient' AND Estado=1";
