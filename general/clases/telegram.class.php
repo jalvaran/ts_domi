@@ -11,9 +11,9 @@ if(file_exists("../../modelo/php_conexion.php")){
 
 class TS_Telegram extends conexion{
     
-    public function EnviarMensajeTelegram($idTelefono,$msg) {
+    public function EnviarMensajeTelegram($idTelefono,$msg,$TelegramToken) {
         
-        $token = "1234833288:AAGN4H21yphumVkC3Vzxa5I16RYAoQwZuJY";
+        $token = $TelegramToken;
         $id = $idTelefono;
         $urlMsg = "https://api.telegram.org/bot{$token}/sendMessage";
         //$msg = '<a href="http://www.domibuga.com/domi/general/Consultas/PDF_Documentos.draw.php?idPedido=15e9688cdaa4eb172260897"> ver pedido</a>';

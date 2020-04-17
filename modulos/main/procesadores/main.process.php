@@ -179,7 +179,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $Consulta=$obCon->Query($sql);
             $MailReport[]="";
             $htmlMensaje="";
-            //$TelegramToken=$obCon->DevuelveValores("configuracion_general", "ID", 2005);//Token api telegram
+            $DatosConfig=$obCon->DevuelveValores("configuracion_general", "ID", 2005);//Token api telegram
+            $TelegramToken=$DatosConfig["Valor"];
             $Ruta=$obCon->DevuelveValores("configuracion_general", "ID", 2006);//Ruta del pdf para ver el pedido
             
             $htmlMensaje='<div class="table-responsive"><h2><strong>Tienes nuevos Pedidos de la Plataforma DoMi!</strong></h2></div>';
@@ -221,7 +222,7 @@ if( !empty($_REQUEST["Accion"]) ){
                 if($DatosConsulta["idTelegram"]<>''){
                     $Enlace='<a href="'.$Link.'" target="_blank">VER PDF</a>';
                     $msg="Tienes un Nuevo pedido en la plataforma Domi, para $Cliente, $Enlace";
-                    $obTel->EnviarMensajeTelegram($DatosConsulta["idTelegram"], $msg);
+                    $obTel->EnviarMensajeTelegram($DatosConsulta["idTelegram"], $msg,$TelegramToken);
                 }
                 
             }
