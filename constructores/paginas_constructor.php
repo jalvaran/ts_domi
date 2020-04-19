@@ -380,13 +380,13 @@ class PageConstruct extends html_estruct_class{
            $disabled="disabled"; 
         }
         if($type<>"textarea"){
-            $html='<div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-'.$iconPostion.'-icon" '.$style.'>
+            $html='<div class="mdc-text-field mdc-text-field--outlined mdc-text-field--with-'.$iconPostion.'-icon " '.$style.'>
                     <i class="material-icons mdc-text-field__icon">'.$icon.'</i>
                     <input type="'.$type.'" id="'.$id.'" name="'.$name.'" value="'.$value.'" class="mdc-text-field__input" '.$js.' '.$disabled.'>
                     <div class="mdc-notched-outline mdc-notched-outline--upgraded">
                       <div class="mdc-notched-outline__leading"></div>
                       <div class="mdc-notched-outline__notch" style="">
-                        <label for="text-field-hero-input" class="mdc-floating-label" style="">'.$placeholder.'</label>
+                        <label for="text-field-hero-input" class="mdc-floating-label " style="">'.$placeholder.'</label>
                       </div>
                       <div class="mdc-notched-outline__trailing"></div>
                     </div>
@@ -484,6 +484,10 @@ class PageConstruct extends html_estruct_class{
             <span class="cart-icon-sp" id="'.$idSp.'">0</span> 
             <span class="cart-icon-sp-total" id="'.$idSpTotal.'">0</span>     
         </a>');
+    }
+    
+    public function IconLogin($js,$id="IconLogin",$Color="green") {
+        print('<a id="'.$id.'" class="login-domi-icon mdi mdi-account-box" '.$js.' style="color:'.$Color.';"></a>');
     }
     
     public function miniChat($js,$id="aShoppingCAr",$idSp="spItemsCar",$idSpTotal="spTotalCar",$Color="#3fd21b") {

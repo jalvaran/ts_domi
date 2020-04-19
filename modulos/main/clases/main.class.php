@@ -102,7 +102,15 @@ class Domi extends conexion{
         $this->Query($sql);
     }
     
-    
+    function ActualiceDatosClienteAcceso($idCliente,$Email,$Password,$Token) {
+        $Datos["Email"]=$Email;
+        $Datos["Password"]=$Password;
+        $Datos["user_token"]=$Token;
+        
+        $sql=$this->getSQLUpdate("client_user", $Datos);
+        $sql.=" WHERE ID='$idCliente'";
+        $this->Query($sql);
+    }
     
    
     /**

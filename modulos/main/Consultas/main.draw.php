@@ -178,7 +178,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
            
         break;//fin caso 4   
         
-        case 5:// Lista de pedidos
+        case 5:// Lista de pedidos en el carrito de compras
             
             $idClientUser=$obCon->normalizar($_REQUEST["idClientUser"]);
             if($idClientUser==''){
@@ -262,6 +262,9 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 $htmInputs="<br>".$inputNombre."<br>".$inputDireccion."<br>".$inputTelefono."<br>".$inputObservaciones;
                 $htmlBotonCancelar=$css->getHtmlBoton(2, "btnDescartarPedido", "btnDescartarPedido", "Descartar", "onclick=ConfimarDescartarPedidos(`$idClientUser`)", "width:100px;");
                 $htmlBotonConfirmar=$css->getHtmlBoton(1, "btnGuardarPedido", "btnGuardarPedido", "Solicitar", "onclick=ConfimarSolicitarPedidos(`$idClientUser`)", "width:100px;");
+                $inputEmail=$css->getHtmlInput("email", "Email", "Email", "", "Email","","","email",1);
+                $inputPassword=$css->getHtmlInput("password", "Password", "Password", "", "Password","","","input",1);
+                $inputPasswordConfirm=$css->getHtmlInput("password", "PasswordConfirm", "PasswordConfirm", "", "Confirmar Password","","","input",1);
                 $htmlFormPedido='<table style="width:100%;background-color:white">
                                 <tr>
                                     <td><strong>Total de este Pedido:</strong></td>
@@ -279,6 +282,34 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                                 <tr>
                                     <td colspan=2 style="text-align:center"><br>'.$inputObservaciones.'<br></td>
                                 </tr> 
+                                <tr>
+                                    <td colspan=2 style="text-align:left">
+                                        
+                                    <div class="mdc-form-field">
+                                        <div class="mdc-checkbox mdc-checkbox--success">
+                                          <input type="checkbox" id="chRegistrarse" class="mdc-checkbox__native-control" onclick=MostrarCamposRegistro()>
+                                          <div class="mdc-checkbox__background">
+                                            <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                                              <path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
+                                            </svg>
+                                            <div class="mdc-checkbox__mixedmark"></div>
+                                          </div>
+                                        </div>
+                                        <label for="basic-disabled-checkbox" id="basic-disabled-checkbox-label"><strong>Registrarse</strong></label>
+                                      </div>
+
+                                    </td>
+                                </tr>
+                                <tr id="divRegistrarse1" style="display:none;">
+                                    <td colspan=2 style="text-align:center">'.$inputEmail.'<br></td>
+                                </tr> 
+                                <tr id="divRegistrarse2" style="display:none;">
+                                    <td colspan=2 style="text-align:center"><br>'.$inputPassword.'<br></td>
+                                </tr> 
+                                <tr id="divRegistrarse3" style="display:none;">
+                                    <td colspan=2 style="text-align:center"><br>'.$inputPasswordConfirm.'<br><br></td>
+                                </tr> 
+                                
                                 <tr>
                                     <td>'.$htmlBotonCancelar.'</td>
                                     <td style="text-align:right">'.$htmlBotonConfirmar.'</td>
@@ -328,7 +359,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             
         break;//fin caso 6
         
-        case 7://formulario para iniciar sesion
+        case 7://formulario para iniciar sesion al modulo administrativo
             
             print('
               <div class="stretch-card mdc-layout-grid__cell--span-4-desktop mdc-layout-grid__cell--span-1-tablet"></div>
@@ -429,6 +460,50 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                       </div>');
             
         break;//Fin caso 8
+        
+        case 9://Formulario de login
+            print('<main class="auth-page">
+                    <div class="mdc-layout-grid">
+                      <div class="mdc-layout-grid__inner">
+                        <div class="stretch-card mdc-layout-grid__cell--span-12-desktop mdc-layout-grid__cell--span-1-tablet"></div>
+                        <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12-desktop mdc-layout-grid__cell--span-12-tablet">
+                          <div class="mdc-card">
+                            
+                              <div class="mdc-layout-grid">
+                                <div class="mdc-layout-grid__inner">
+                                  <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+                                    <div class="mdc-text-field w-100 mdc-ripple-upgraded" style="--mdc-ripple-fg-size:209px; --mdc-ripple-fg-scale:1.7296289512582848; --mdc-ripple-fg-translate-start:11.83331298828125px, -74.5px; --mdc-ripple-fg-translate-end:69.79998779296875px, -82px;">
+                                      <input class="mdc-text-field__input" id="emailLogin">
+                                      <div class="mdc-line-ripple" style="transform-origin: 116.333px center 0px;"></div>
+                                      <label for="text-field-hero-input" class="mdc-floating-label">Email</label>
+                                    </div>
+                                  </div>
+                                  <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+                                    <div class="mdc-text-field w-100 mdc-ripple-upgraded">
+                                      <input class="mdc-text-field__input" type="password" id="passLogin">
+                                      <div class="mdc-line-ripple"></div>
+                                      <label for="text-field-hero-input" class="mdc-floating-label">Password</label>
+                                    </div>
+                                  </div>
+                                  
+                                  <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-6-desktop d-flex align-items-center justify-content-end">
+                                    
+                                  </div>
+                                  <div class="mdc-layout-grid__cell stretch-card mdc-layout-grid__cell--span-12">
+                                    <button id="btnLoginUser" class="mdc-button mdc-button--raised w-100 mdc-ripple-upgraded" onclick=initLoginUser()>
+                                      Entrar
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                          
+                          </div>
+                        </div>
+                        <div class="stretch-card mdc-layout-grid__cell--span-4-desktop mdc-layout-grid__cell--span-1-tablet"></div>
+                      </div>
+                    </div>
+                  </main>');
+        break;//Fin caso 9    
         
  }
     

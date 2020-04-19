@@ -219,7 +219,7 @@ $this->PDF->writeHTML("<br>", true, false, false, false, '');
         <table cellspacing="0" cellpadding="2" border="1">
             <tr>
                 <td><strong>Fecha y Hora:</strong></td>
-                <td colspan="3">'.utf8_encode($DatosCliente["Created"]).'</td>
+                <td colspan="3">'.utf8_encode($DatosPedido["Created"]).'</td>
 
             </tr>
             <tr>

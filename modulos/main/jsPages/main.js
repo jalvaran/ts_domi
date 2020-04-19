@@ -8,7 +8,9 @@ var idPantalla=1;
 var lastLocal=1;
 var lastCategory=1;
 var Page=1;
-var idClientUser=getIdClientUser();
+idClientUser="";
+getIdClientUser();
+
 function VerPantallaSegunID(){
     
     if(idPantalla==1){
@@ -53,13 +55,42 @@ function pageAdd(){
 }
 
 function getIdClientUser(){
-    var idClientUser = Cookies.get('idClientUser');    
-    if(idClientUser==undefined){        
-        idClientUser=uuid.v4();
-        Cookies.set('idClientUser',idClientUser,{expires: 9999});
-    }
-    //console.log(idClientUser);
-    return(idClientUser);
+    
+    var form_data = new FormData();
+        form_data.append('Accion', '8'); 
+                
+        $.ajax({
+        url: './procesadores/main.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            
+            var respuestas = data.split(';');
+            if(respuestas[0]=="OK"){   
+                console.log("Entra a verificar "+respuestas[1]);
+                idClientUser=respuestas[1];
+                ActualizarTotalItemsCarro(idClientUser);
+            }else{
+                idClientUser = Cookies.get('idClientUser');    
+                if(idClientUser==undefined){        
+                    idClientUser=uuid.v4();
+                    Cookies.set('idClientUser',idClientUser,{expires: 9999});
+                }
+                ActualizarTotalItemsCarro(idClientUser);
+            }
+                    
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+      
     
 }
 
@@ -336,7 +367,7 @@ function VerCarrito(){
         success: function(data){            
             document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
             initForm();
-            //AutocomplementarDatosCliente();
+            AutocomplementarDatosCliente();
         },
         error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
             document.getElementById(idDiv).innerHTML="hay un problema!";
@@ -464,9 +495,11 @@ function ConfimarSolicitarPedidos(idUserClient){
     alertify.confirm('Seguro que desea Realizar el pedido? ',
         function (e) {
             if (e) {
+                
                 grecaptcha.execute('6LdoC-gUAAAAADi7iGr_b8WtxMijj24V8v-dAtB-', {action: 'homepage'}).then(function(token) {
                      CrearPedido(idUserClient,token);
                 });
+                
                 
             }else{
                 alertify.error("Se canceló el proceso");
@@ -478,17 +511,19 @@ function ConfimarSolicitarPedidos(idUserClient){
 
 
 function CrearPedido(idUserClient,token){
-    
+    var idBoton='btnGuardarPedido';
+    document.getElementById(idBoton).disabled=true;
+    document.getElementById(idBoton).value="Enviando...";
     var NombreCliente=document.getElementById('NombreCliente').value;
     var DireccionCliente=document.getElementById('DireccionCliente').value;
     var Telefono=document.getElementById('Telefono').value;
     var ObservacionesPedido=document.getElementById('ObservacionesPedido').value;
-    
-    
+    var chRegistrarse=document.getElementById('chRegistrarse').checked;
+    var Email=document.getElementById('Email').value;
+    var Password=document.getElementById('Password').value;
+    var PasswordConfirm=document.getElementById('PasswordConfirm').value;
     var idDiv="divMain";
-    document.getElementById(idDiv).innerHTML='<div id="GifProcess">Enviando pedidos a los locales...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
-    
-    
+        
     var form_data = new FormData();
         form_data.append('Accion', '5'); 
         form_data.append('NombreCliente', NombreCliente);
@@ -496,6 +531,10 @@ function CrearPedido(idUserClient,token){
         form_data.append('Telefono', Telefono);
         form_data.append('ObservacionesPedido', ObservacionesPedido);
         form_data.append('idUserClient', idUserClient);
+        form_data.append('chRegistrarse', chRegistrarse);
+        form_data.append('Email', Email);
+        form_data.append('Password', Password);
+        form_data.append('PasswordConfirm', PasswordConfirm);
         form_data.append('token', token);
         form_data.append('action', 'homepage');
                         
@@ -508,7 +547,8 @@ function CrearPedido(idUserClient,token){
         data: form_data,
         type: 'post',
         success: function(data){
-            
+            document.getElementById(idBoton).disabled=false;
+            document.getElementById(idBoton).value="Solicitar";
             var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
             if(respuestas[0]=="OK"){ 
                 alertify.alert(respuestas[1]);
@@ -523,7 +563,8 @@ function CrearPedido(idUserClient,token){
                     
         },
         error: function (xhr, ajaxOptions, thrownError) {
-            
+            document.getElementById(idBoton).disabled=false;
+            document.getElementById(idBoton).value="Solicitar";
             alert(xhr.status);
             alert(thrownError);
           }
@@ -675,6 +716,7 @@ function AutocomplementarDatosCliente(){
         return;
     }
     
+       
     var form_data = new FormData();
         form_data.append('Accion', '7'); 
         
@@ -692,6 +734,7 @@ function AutocomplementarDatosCliente(){
             
             var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
             if(respuestas[0]=="OK"){ 
+                $(".mdc-floating-label").addClass("mdc-floating-label--float-above");
                 $("#NombreCliente").click();
                 $("#DireccionCliente").click();
                 $("#Telefono").focus();
@@ -704,9 +747,7 @@ function AutocomplementarDatosCliente(){
                 
                 
                
-            }else{
-                console.log(respuestas);
-            }              
+            }            
         },
         error: function (xhr, ajaxOptions, thrownError) {
             
@@ -715,9 +756,119 @@ function AutocomplementarDatosCliente(){
           }
       });
 }
+function MostrarCamposRegistro(){
+    var chRegistro=document.getElementById('chRegistrarse').checked;
+    
+    if(chRegistro==false){
+        MuestraOcultaXID("divRegistrarse1",0);
+        MuestraOcultaXID("divRegistrarse2",0);
+        MuestraOcultaXID("divRegistrarse3",0);
+        
+    }else{
+        MuestraOcultaXID("divRegistrarse1",1);
+        MuestraOcultaXID("divRegistrarse2",1);
+        MuestraOcultaXID("divRegistrarse3",1);
+    }
+    
+} 
+function MuestraOcultaXID(id,Mostrar){
+    if(Mostrar==1){
+        document.getElementById(id).style.display="block";
+    }else{
+        document.getElementById(id).style.display="none";
+    }
+}
+
+function FormLogin(){
+    
+    AbreModal('modalMain');
+    var idDiv="DivModal";
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
+    
+    var form_data = new FormData();
+        form_data.append('Accion', 9);// pasamos la accion y el numero de accion para el dibujante sepa que caso tomar
+                        
+       $.ajax({// se arma un objecto por medio de ajax  
+        url: 'Consultas/main.draw.php',// se indica donde llegara la informacion del objecto
+        
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+            initForm();
+        },
+        error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
+            document.getElementById(idDiv).innerHTML="hay un problema!";
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+}
+
+function initLoginUser(){
+    grecaptcha.execute('6LdoC-gUAAAAADi7iGr_b8WtxMijj24V8v-dAtB-', {action: 'login'}).then(function(token) {
+            LoginUser(token);
+       });
+}
+
+function LoginUser(token){
+    var idBoton='btnLoginUser';
+    document.getElementById(idBoton).disabled=true;
+    document.getElementById(idBoton).value="Entrando...";
+    var emailLogin=document.getElementById('emailLogin').value;
+    var passLogin=document.getElementById('passLogin').value;
+    
+    var idDiv="divMain";
+        
+    var form_data = new FormData();
+        form_data.append('Accion', '10'); 
+        form_data.append('emailLogin', emailLogin);
+        form_data.append('passLogin', passLogin);        
+        form_data.append('token', token);
+        form_data.append('action', 'login');
+                        
+        $.ajax({
+        url: './procesadores/main.process.php',
+        //dataType: 'json',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: form_data,
+        type: 'post',
+        success: function(data){
+            document.getElementById(idBoton).disabled=false;
+            document.getElementById(idBoton).value="Entrar";
+            var respuestas = data.split(';'); //Armamos un vector separando los punto y coma de la cadena de texto
+            if(respuestas[0]=="OK"){ 
+                alertify.success(respuestas[1]);
+                idClientUser=respuestas[2];
+                CierraModal('modalMain');
+                VerPantallaSegunID();
+                ActualizarTotalItemsCarro(idClientUser);
+                Cookies.set('idClientUser',idClientUser,{expires: 9999});
+            }else if(respuestas[0]=="E1"){  
+                alertify.error(respuestas[1]);
+                MarqueErrorElemento(respuestas[2]);
+            }else{
+                alertify.alert(data);                
+            }
+                    
+        },
+        error: function (xhr, ajaxOptions, thrownError) {
+            document.getElementById(idBoton).disabled=false;
+            document.getElementById(idBoton).value="Solicitar";
+            alert(xhr.status);
+            alert(thrownError);
+          }
+      });
+    
+}
 
 ListarCategoria();
 MostrarLinksEnlaces();
-ActualizarTotalItemsCarro(idClientUser);
+
 
 

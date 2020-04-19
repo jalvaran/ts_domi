@@ -15,7 +15,7 @@
   position: fixed;
   cursor:pointer;
   z-index: 2;
-  top: 5%;
+  top: 20%;
   right: 10px;
   height: 60px;
   width: 60px;
@@ -139,4 +139,30 @@
   -webkit-transition: -webkit-transform 0.2s 0s;
   -moz-transition: -moz-transform 0.2s 0s;
   transition: transform 0.2s 0s;
+}
+
+
+
+.login-domi {
+  position: absolute;
+  width: auto;
+  left: -500%;
+  list-style: none;
+  background: #fff;
+  
+  border-radius: 4px;
+  top: -1.5em;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.login-domi-icon {
+  position: fixed;
+  cursor:pointer;
+  z-index: 2;
+  top: 5%;
+  right: 10px;
+  height: 60px;
+  width: 60px;
+  font-size:60px;
+  
 }

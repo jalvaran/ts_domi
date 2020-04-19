@@ -13,6 +13,21 @@ class TS_Telegram extends conexion{
     
     public function EnviarMensajeTelegram($idTelefono,$msg,$TelegramToken) {
         
+        $msg= str_replace("*", " ", $msg);
+        $msg= str_replace("[", " ", $msg);
+        $msg= str_replace("]", " ", $msg);
+        $msg= str_replace("(", " ", $msg);
+        $msg= str_replace(")", " ", $msg);
+        $msg= str_replace("~", " ", $msg);
+        $msg= str_replace("`", " ", $msg);
+        $msg= str_replace("#", " ", $msg);
+        $msg= str_replace("+", " ", $msg);
+        $msg= str_replace("-", " ", $msg);
+        $msg= str_replace("|", " ", $msg);
+        $msg= str_replace("{", " ", $msg);
+        $msg= str_replace("}", " ", $msg);
+        $msg= str_replace("!", " ", $msg);
+        $msg= str_replace("&", " ", $msg);
         $token = $TelegramToken;
         $id = $idTelefono;
         $urlMsg = "https://api.telegram.org/bot{$token}/sendMessage";

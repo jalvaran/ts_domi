@@ -10,15 +10,13 @@ $myTitulo="Domi Buga";  //Titulo en la pestaña del navegador
 //include_once("../../sesiones/php_control_usuarios.php"); //Controla los permisos de los usuarios
 include_once("../../modelo/php_conexion.php"); //clase que permite la conexion con la base de datos
 include_once("../../constructores/paginas_constructor.php"); //Construye la pagina, estan las herramientas para construir los objetos de la pagina
-include_once("../../general/clases/WhatsmsApi.php");
+
 $css =  new PageConstruct($myTitulo); //instancia para el objeto con las funciones del html
-$whatsmsapi = new WhatsmsApi();
-$whatsmsapi->setApiKey("5e9914062a137");
-$Respuesta=$whatsmsapi->sendSms("0573177740609", "Hello World!");
-print_r($Respuesta);
+
 $obCon = new conexion(1); //instancia para Conexion a la base de datos
 
 $css->ShoppingCar("onclick=VerCarrito();");
+$css->IconLogin("onclick=FormLogin();");
 //$css->miniChat("onclick=VerChat();");
 $css->botonNavegacion("onclick=ListarCategoria()", "#246ce1", "pageNav-home-icon mdi mdi-home","","");
 $css->botonNavegacion("onclick=ListarAnterior()", "black", "pageNav-back-icon mdi mdi-skip-backward");

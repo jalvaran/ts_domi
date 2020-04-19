@@ -5,7 +5,7 @@ include_once("../../../general/clases/telegram.class.php");
 if(file_exists("../../../general/clases/mail.class.php")){
     include_once("../../../general/clases/mail.class.php");
 }
-
+session_start();
 if( !empty($_REQUEST["Accion"]) ){
     
     $obCon=new Domi(1);
@@ -143,6 +143,7 @@ if( !empty($_REQUEST["Accion"]) ){
         break;//Fin caso 4
         
         case 5://Solicitar pedido
+            
             $token = $_POST['token'];
             $action = $_POST['action'];      
             
@@ -168,7 +169,48 @@ if( !empty($_REQUEST["Accion"]) ){
             if($Telefono==""){
                 exit("E1;Debes escribir un Número Telefónico;Telefono");
             }
-            
+            $ValidacionMetodoEnvio=$obCon->DevuelveValores("configuracion_general", "ID", 25);//Determina el metodo de envio
+            if(isset($_REQUEST["chRegistrarse"])){
+                $chRegistrarse=$obCon->normalizar($_REQUEST["chRegistrarse"]);  
+                $Email=strtolower($obCon->normalizar($_REQUEST["Email"]));  
+                $Password=$obCon->normalizar($_REQUEST["Password"]);  
+                $PasswordConfirm=$obCon->normalizar($_REQUEST["PasswordConfirm"]); 
+                //exit("che $chRegistrarse");
+                if($chRegistrarse=="true"){
+                    if($Email==""){
+                        exit("E1;Debes escribir una dirección de correo electronico válida;Email");
+                    }
+                    if(!filter_var($Email, FILTER_VALIDATE_EMAIL)){
+                        exit("E1;El campo Email No contiene un Correo válido;Email");
+                    }
+                    if($Password==""){
+                        exit("E1;Debes escribir una contraseña;Password");
+                    }
+                    if($PasswordConfirm==""){
+                        exit("E1;Debes confirmar la contraseña;PasswordConfirm");
+                    }
+                    if($Password<>$PasswordConfirm){
+                        exit("E1;El password digitado no coincide;PasswordConfirm");
+                    }
+                    
+                    $sql="SELECT ID FROM client_user WHERE Email='$Email'";
+                    $DatosConsultaMail=$obCon->FetchAssoc($obCon->Query($sql));
+                    if($DatosConsultaMail["ID"]<>''){
+                        exit("E1;El Email $Email ya existe;Email");
+                        
+                    }else{
+                        $TokenUserAccess=$obCon->getUniqId("u_");
+                        $obCon->ActualiceDatosClienteAcceso($idUserClient, $Email, $Password, $TokenUserAccess);
+                        $MensajeActivacion="Te haz registrado en la plataforma Domi!, Verifica tu cuenta aqui: ";
+                        $Ruta='www.domibuga.com/domi/modulos/main/procesadores/main.process.php?Accion=9&idTokenUserClient='.$TokenUserAccess;
+                        $Link='<a href="'.$Ruta.'" target="_blank">Verificar Cuenta</a>';
+                        $MensajeActivacion.=$Link;
+                        //if($ValidacionMetodoEnvio["Valor"]==1){                           
+                        $obMail->EnviarMailXPHPMailer($Email, "technosoluciones.domi@gmail.com", "PLATAFORMA DOMI", "Activacion de Cuenta", $MensajeActivacion);
+                        
+                    }
+                }
+            }
             $obCon->ActualiceDatosCliente($idUserClient, $NombreCliente, $DireccionCliente, $Telefono);
             $obTel=new TS_Telegram($idUser);
             
@@ -185,8 +227,11 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $htmlMensaje='<div class="table-responsive"><h2><strong>Tienes nuevos Pedidos de la Plataforma DoMi!</strong></h2></div>';
             $htmlMensaje.='<table class="table"><tr><th><strong>LISTA DE PEDIDOS:</strong></th></tr>';
-            
+            $DatosLocalAdministrador=$obCon->DevuelveValores("locales", "ID", 1);
+            $idTelegranGeneral=$DatosLocalAdministrador["idTelegram"];
             $i=0;
+            $Validacion=$obCon->DevuelveValores("configuracion_general", "ID", 2002);//Determina si se envia correo de notificacion
+            
             while($DatosConsulta=$obCon->FetchAssoc($Consulta)){
                 $Link=$Ruta["Valor"].$DatosConsulta["ID"];
                 if($DatosConsulta["Email"]<>''){
@@ -218,33 +263,31 @@ if( !empty($_REQUEST["Accion"]) ){
                             </tr>';
                 
                 $i=$i+1;
-                
-                if($DatosConsulta["idTelegram"]<>''){
-                    $Enlace='<a href="'.$Link.'" target="_blank">VER PDF</a>';
-                    $msg="Tienes un Nuevo pedido en la plataforma Domi, para $Cliente, $Enlace";
-                    $obTel->EnviarMensajeTelegram($DatosConsulta["idTelegram"], $msg,$TelegramToken);
+                $Enlace='<a href="'.$Link.'" target="_blank">VER PDF</a>';
+                $msg="Tienes un Nuevo pedido en la plataforma Domi, para $Cliente, $Enlace";
+                if($DatosConsulta["idTelegram"]<>''){                    
+                    $obTel->EnviarMensajeTelegram($DatosConsulta["idTelegram"], $msg,$TelegramToken);                    
                 }
-                
+                $obTel->EnviarMensajeTelegram($idTelegranGeneral, $msg,$TelegramToken);
             }
             $htmlMensaje.="</table>";
             $sql="UPDATE pedidos SET Estado=2,Observaciones='$ObservacionesPedido' WHERE cliente_id='$idUserClient' AND Estado=1";
             $obCon->Query($sql);
             
-            $Validacion=$obCon->DevuelveValores("configuracion_general", "ID", 2002);//Determina si se envia correo de notificacion
             
             if($Validacion["Valor"]==1){
-                $ValidacionMetodoEnvio=$obCon->DevuelveValores("configuracion_general", "ID", 25);//Determina el metodo de envio
+                
                 if($ValidacionMetodoEnvio["Valor"]==1){
                     if(isset($MailReport["Email"])){
                         foreach ($MailReport["Email"] as $key => $value) {
-                            $obMail->EnviarMailXPHPNativo($value, "technosoluciones.domi@gmail.com", "PLATAFORMA DOMI", $MailReport["Asunto"][$key], $MailReport["Html"][$key]);
+                            //$obMail->EnviarMailXPHPNativo($value, "technosoluciones.domi@gmail.com", "PLATAFORMA DOMI", $MailReport["Asunto"][$key], $MailReport["Html"][$key]);
                         }
                     }
                     
                 }else{
                     if(isset($MailReport["Email"])){
                         foreach ($MailReport["Email"] as $key => $value) {
-                            $obMail->EnviarMailXPHPMailer($value, "technosoluciones.domi@gmail.com", "PLATAFORMA DOMI", $MailReport["Asunto"][$key], $MailReport["Html"][$key]);
+                            //$obMail->EnviarMailXPHPMailer($value, "technosoluciones.domi@gmail.com", "PLATAFORMA DOMI", $MailReport["Asunto"][$key], $MailReport["Html"][$key]);
                         }
                     }
                     
@@ -279,10 +322,62 @@ if( !empty($_REQUEST["Accion"]) ){
             $sql="SELECT Nombre,Telefono,Direccion FROM client_user WHERE ID='$idUserClient'";
             $Consulta=$obCon->Query($sql);
             $DatosCliente=$obCon->FetchAssoc($Consulta);
-            
+            if($DatosCliente["Nombre"]==""){
+                exit("E1");
+            }
             print("OK;".$DatosCliente["Nombre"].";".$DatosCliente["Telefono"].";".$DatosCliente["Direccion"]);
         break;//Fin caso 7
         
+        case 8://verifica inicio de sesion
+            
+            $idUserClient=$obCon->normalizar($_REQUEST["idUserClient"]);  
+            
+            if($idUserClient==""){
+                exit("E1;No se recibió el id del cliente");
+            }
+            
+            if(isset($_SESSION["user_id"])){
+                return("OK;".$_SESSION["user_id"]);
+            }else{
+                return("E1;No se ha iniciado sesion");
+            }
+           
+           
+        break;//Fin caso 8
+        
+        case 9://Valida la creacion de una cuenta
+            
+            $idToken=$obCon->normalizar($_REQUEST["idTokenUserClient"]); 
+            $sql="SELECT ID FROM client_user WHERE user_token='$idToken' AND Verificado='0' AND Habilitado='0'";
+            $DatosValidacion=$obCon->FetchAssoc($obCon->Query($sql));
+            if($DatosValidacion["ID"]==''){
+                exit("<h2>La cuenta ya fué activada o no existe</h2>");
+            }
+            
+            $sql="UPDATE client_user SET Verificado=1, Habilitado=1 WHERE user_token='$idToken' LIMIT 1";
+            $obCon->Query($sql);
+            exit("<h2>La cuenta ha sido activada por favor entra a Domi e inicia sesion</h2>");
+        break;//Fin caso 9
+        
+        case 10://Iniciar sesion de un usuario comprador
+            $token = $_POST['token'];
+            $action = $_POST['action'];  
+            $respuestaToken=$obCon->validaTokenGoogle($token, $action,RECAPTCHA_V3_SECRET_KEY);
+            if($respuestaToken["success"]<>1 or $respuestaToken["action"]<>$action){
+                exit("E1;El token googel no coincide");
+            }
+            $emailLogin= strtolower($obCon->normalizar($_REQUEST["emailLogin"]));
+            $passLogin=$obCon->normalizar($_REQUEST["passLogin"]);
+            
+            $sql="SELECT ID FROM client_user WHERE Email='$emailLogin' AND Password='$passLogin'";
+            $DatosLogin=$obCon->FetchAssoc($obCon->Query($sql));
+            if($DatosLogin["ID"]==''){
+                exit("E1;Usuario o Password incorrectos");
+            }else{
+                $_SESSION["user_id"]=$DatosLogin["ID"];
+                exit("OK;Inicio de sesion correcto;".$DatosLogin["ID"]);
+            }
+        break;//Fin caso 10    
         
     }
           
