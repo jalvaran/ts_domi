@@ -9,7 +9,18 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
     
     $css =  new PageConstruct("", "", 1, "", 1, 0);// se instancia para poder utilizar el html
     $obCon = new Domi(1);// se instancia para poder conectarse con la base de datos 
-        
+    
+    $user_id="";
+    if(isset($_REQUEST["idClientUser"])){
+        $user_id=$obCon->normalizar($_REQUEST["idClientUser"]);
+        $sql="SELECT ID from client_user WHERE Betado=1 AND ID='$user_id'";
+        $ConsultaBeto=$obCon->FetchAssoc($obCon->Query($sql));
+        if($ConsultaBeto["ID"]<>''){
+            exit("<h1>Fuera de Linea</h1>");
+        }
+    
+    }
+    
     switch($_REQUEST["Accion"]) {
        
         case 1://Listar las categorias
@@ -57,8 +68,12 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
         
         case 3://dibuja la informacion general del local
             
+            
+            
             $idLocal=$obCon->normalizar($_REQUEST["idLocal"]);
             $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
+            $Telefono= str_replace(" ","",$DatosLocal["Indicativo"].$DatosLocal["Whatsapp"]);
+            $css->IconWhats($Telefono,"Hola ".$DatosLocal["Nombre"].", encontré tu número en la plataforma domi ");
             $js="onclick=DibujaLocal(`$idLocal`)";
             $RutaImagen="../../images/image.webp";
             $DatosFondo=$obCon->DevuelveValores("locales_imagenes", "idLocal", $idLocal);
@@ -159,7 +174,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                             
                             $sql="SELECT t1.*,
                                     (SELECT t2.Ruta FROM productos_servicios_imagenes t2 WHERE t1.ID=t2.idProducto ORDER BY t1.ID ASC LIMIT 1) as RutaImagen 
-                                    FROM productos_servicios t1 $Condicion ORDER BY ID DESC LIMIT $PuntoInicio,$Limit;";
+                                    FROM productos_servicios t1 $Condicion ORDER BY Orden ASC LIMIT $PuntoInicio,$Limit;";
                             
                             $Consulta=$obCon->Query2($sql, HOST, USER, PW, $dbLocal, "");
                             while($DatosProductos=$obCon->FetchAssoc($Consulta)){

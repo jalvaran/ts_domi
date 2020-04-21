@@ -37,6 +37,12 @@ if( !empty($_REQUEST["Accion"]) ){
             
             //Verifico el valor unitario del producto
            
+            $sql="SELECT ID from client_user WHERE Betado=1 AND ID='$user_id'";
+            $ConsultaBeto=$obCon->FetchAssoc($obCon->Query($sql));
+            if($ConsultaBeto["ID"]<>''){
+                exit("<h1>No puedes agregar items</h1>");
+            }
+            
             $sql="SELECT PrecioVenta FROM productos_servicios WHERE ID='$product_id';";
             $Consulta= $obCon->Query2($sql, HOST, USER, PW, $local_db, ""); 
             $DatosProducto= $obCon->FetchAssoc($Consulta);
@@ -169,6 +175,11 @@ if( !empty($_REQUEST["Accion"]) ){
             if($Telefono==""){
                 exit("E1;Debes escribir un Número Telefónico;Telefono");
             }
+            $sql="SELECT ID from client_user WHERE Betado=1 AND ID='$idUserClient'";
+            $ConsultaBeto=$obCon->FetchAssoc($obCon->Query($sql));
+            if($ConsultaBeto["ID"]<>''){
+                exit("<h1>No puedes realizar pedidos</h1>");
+            }
             $ValidacionMetodoEnvio=$obCon->DevuelveValores("configuracion_general", "ID", 25);//Determina el metodo de envio
             if(isset($_REQUEST["chRegistrarse"])){
                 $chRegistrarse=$obCon->normalizar($_REQUEST["chRegistrarse"]);  
@@ -216,7 +227,7 @@ if( !empty($_REQUEST["Accion"]) ){
             
             $Cliente=" $NombreCliente, $DireccionCliente, $Telefono ";
             
-            $sql="SELECT t1.Created,t1.ID,t1.local_id,t2.Email,t2.Nombre,t2.idTelegram FROM pedidos t1 INNER JOIN locales t2 ON t1.local_id=t2.ID
+            $sql="SELECT t1.Created,t1.ID,t1.local_id,t2.Email,t2.Nombre,t2.idTelegram,t2.UsaDomicilioDomi FROM pedidos t1 INNER JOIN locales t2 ON t1.local_id=t2.ID
                      WHERE cliente_id='$idUserClient' AND t1.Estado=1";
             $Consulta=$obCon->Query($sql);
             $MailReport[]="";
@@ -228,7 +239,8 @@ if( !empty($_REQUEST["Accion"]) ){
             $htmlMensaje='<div class="table-responsive"><h2><strong>Tienes nuevos Pedidos de la Plataforma DoMi!</strong></h2></div>';
             $htmlMensaje.='<table class="table"><tr><th><strong>LISTA DE PEDIDOS:</strong></th></tr>';
             $DatosLocalAdministrador=$obCon->DevuelveValores("locales", "ID", 1);
-            $idTelegranGeneral=$DatosLocalAdministrador["idTelegram"];
+            $idDomicilioDomi=$DatosLocalAdministrador["idTelegramCanal"];
+            $idTelegranAdmin=$DatosLocalAdministrador["idTelegram"];
             $i=0;
             $Validacion=$obCon->DevuelveValores("configuracion_general", "ID", 2002);//Determina si se envia correo de notificacion
             
@@ -268,7 +280,11 @@ if( !empty($_REQUEST["Accion"]) ){
                 if($DatosConsulta["idTelegram"]<>''){                    
                     $obTel->EnviarMensajeTelegram($DatosConsulta["idTelegram"], $msg,$TelegramToken);                    
                 }
-                $obTel->EnviarMensajeTelegram($idTelegranGeneral, $msg,$TelegramToken);
+                if($DatosConsulta["UsaDomicilioDomi"]==1){
+                    $obTel->EnviarMensajeTelegram($idDomicilioDomi, $msg,$TelegramToken);
+                }
+                
+                $obTel->EnviarMensajeTelegram($idTelegranAdmin, $msg,$TelegramToken);
             }
             $htmlMensaje.="</table>";
             $sql="UPDATE pedidos SET Estado=2,Observaciones='$ObservacionesPedido' WHERE cliente_id='$idUserClient' AND Estado=1";

@@ -24,6 +24,10 @@ class PageConstruct extends html_estruct_class{
                 print('<meta charset="UTF-8">
                         <meta name="viewport" content="width=device-width, initial-scale=1.0">
                         <meta http-equiv="X-UA-Compatible" content="ie=edge">
+                        <meta name="author" content="Techno Soluciones SAS">
+                        <meta name="description" content="Centro comercial Virtual">
+                        <meta name="keywords" content="restaurante,centro comercial,comercial,ventas,buga,valle,klam,villa,burger,almacen,ropa,servicios">
+
                         <title>DomiBuga</title>
                         <!-- plugins:css -->
                         <link rel="stylesheet" href="../../assets/bootstrap/css/bootstrap.min.css">
@@ -728,7 +732,10 @@ class PageConstruct extends html_estruct_class{
 	function CerrarTabla(){
             return('</table></div>');		
 	}
-    
+        
+        public function IconWhats($Telefono,$Mensaje,$js="",$id="IconWhats",$Color="green") {
+            print('<a id="'.$id.'" class="whats-domi-icon mdi mdi-whatsapp" style="color:'.$Color.'" target="_blank" href="https://api.whatsapp.com/send?phone='.$Telefono.'&text='.$Mensaje.'"  '.$js.'></a>');
+        }
    //Fin Clases
 }
 	
