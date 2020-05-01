@@ -4,32 +4,10 @@
  * 2020-04-04
  */
 
-var ProductosCargados=0;
- 
-$(window).scroll(function(){
-    var alturaPantalla = $(document).height();
-    
-    if($("#divLoading").length && ProductosCargados==0){            
-        document.getElementById('divLoading').innerHTML="";
-    }
-    
-    if($(window).scrollTop() + $(window).height() >= (alturaPantalla-100) && ProductosCargados==1) {
-        //alertify.success($(window).scrollTop()+" || "+$(window).height()+" || "+alturaPantalla);
-        if(idPantalla==3){//Si estoy viendo un local
-            //alertify.success("Cargando");
-            ProductosCargados=0;                
-            document.getElementById('divLoading').innerHTML='<div id="GifProcess"><br><img   src="../../images/loading.gif" height="100" width="100"></div>';
-            pageMoreLoad();
-        }
-    }
-                
-});
-
 var idPantalla=1;
 var lastLocal=1;
 var lastCategory=1;
 var Page=1;
-
 idClientUser="";
 getIdClientUser();
 
@@ -74,11 +52,6 @@ function pageMinus(){
 function pageAdd(){
     Page=parseInt(Page)+1;
     ListarProductos(lastLocal);
-}
-
-function pageMoreLoad(){
-    Page=parseInt(Page)+1;
-    ListarProductos(lastLocal,1);
 }
 
 function getIdClientUser(){
@@ -244,10 +217,10 @@ function DibujaLocal(idLocal=''){
 }
 
 
-function ListarProductos(idLocal='',Scroll=0){
+function ListarProductos(idLocal=''){
     
     var idDiv="DivProductos";
-    
+    document.getElementById(idDiv).innerHTML='<div id="GifProcess">cargando...<br><img   src="../../images/loading.gif" alt="Cargando" height="100" width="100"></div>';
     var cmbClasificacion = document.getElementById('cmbClasificacion').value;
     var BusquedaProducto = document.getElementById('BusquedaProducto').value;
     var form_data = new FormData();
@@ -257,7 +230,6 @@ function ListarProductos(idLocal='',Scroll=0){
         form_data.append('cmbClasificacion', cmbClasificacion);
         form_data.append('BusquedaProducto', BusquedaProducto);
         form_data.append('Page', Page);
-        form_data.append('Scroll', Scroll);
                 
        $.ajax({// se arma un objecto por medio de ajax  
         url: 'Consultas/main.draw.php',// se indica donde llegara la informacion del objecto
@@ -267,23 +239,10 @@ function ListarProductos(idLocal='',Scroll=0){
         processData: false,
         data: form_data,
         type: 'post', // se especifica que metodo de envio se utilizara normalmente y por seguridad se utiliza el post
-        success: function(data){  
-            
-            if($("#divLoading").length){
-                document.getElementById('divLoading').innerHTML="";
-            }
-            if(data==''){
-                Page=Page-1;
-                return;
-            }
-            if(Scroll==1){
-                document.getElementById(idDiv).innerHTML=document.getElementById(idDiv).innerHTML+data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
-            }else{
-                document.getElementById(idDiv).innerHTML=data;
-            }
-            setTextareaHeight($('textarea'));
-            initForm();
-            ProductosCargados=1;
+        success: function(data){            
+            document.getElementById(idDiv).innerHTML=data; //La respuesta del servidor la dibujo en el div DivTablasBaseDatos                      
+             setTextareaHeight($('textarea'));
+             initForm();
             },
         error: function (xhr, ajaxOptions, thrownError) {// si hay error se ejecuta la funcion
             document.getElementById(idDiv).innerHTML="hay un problema!";

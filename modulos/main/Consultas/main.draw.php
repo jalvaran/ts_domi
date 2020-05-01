@@ -2,7 +2,7 @@
 
 include_once("../clases/main.class.php");// se debe incluir la clase del modulo 
 include_once("../../../constructores/paginas_constructor.php");// siempre debera de ir ya que utilizara html que esta en el constructor
-
+$Domain=$_SERVER['HTTP_HOST'];
 $ipUser=$_SERVER['REMOTE_ADDR'];
 
 if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente a vacio 
@@ -40,8 +40,11 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             
         break;//Fin caso 1    
         case 2://dibuja el listado de los locales
+            $Dominio=$obCon->normalizar($Domain);
+            $DatosDominio=$obCon->DevuelveValores("dominios", "Dominio", $Dominio);
+            $idCiudad=$DatosDominio["idCiudad"];
             $idCategoria=$obCon->normalizar($_REQUEST["Categoria"]);
-            $sql="SELECT * FROM locales WHERE idCategoria='$idCategoria' AND Estado=1 ORDER BY Orden ASC";
+            $sql="SELECT * FROM locales WHERE idCategoria='$idCategoria' AND Estado=1 AND idCiudad='$idCiudad' ORDER BY Orden ASC";
             $Consulta=$obCon->Query($sql);
             $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 2004); //Se aloja la ruta del enlace
             while($DatosCategorias=$obCon->FetchAssoc($Consulta)){
@@ -55,7 +58,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                     
                 }
                 
-                $LinkLocal=$Configuracion["Valor"].$idItem;
+                $LinkLocal=$Dominio.$Configuracion["Valor"].$idItem;
                 $idLinkLocal="linkLocal_".$idItem;
                 $link='<span id="'.$idLinkLocal.'" type="hidden" style="display:none;">'.$LinkLocal.'</span>
                         <span class="mdi mdi-link-variant-plus" onclick="CopiarLinkLocal(`'.$idLinkLocal.'`)"> Copiar Link</span>
@@ -68,8 +71,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
         
         case 3://dibuja la informacion general del local
             
-            
-            
+            $Dominio=$obCon->normalizar($Domain);
             $idLocal=$obCon->normalizar($_REQUEST["idLocal"]);
             $DatosLocal=$obCon->DevuelveValores("locales", "ID", $idLocal);
             $Telefono= str_replace(" ","",$DatosLocal["Indicativo"].$DatosLocal["Whatsapp"]);
@@ -91,7 +93,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 $i=$i+1;
             }
             $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 2004); //Se aloja la ruta del enlace
-            $LinkLocal=$Configuracion["Valor"].$idLocal;
+            $LinkLocal=$Dominio.$Configuracion["Valor"].$idLocal;
             $idLinkLocal="linkLocal_".$idLocal;
             $link='<span id="'.$idLinkLocal.'" type="hidden" style="display:none;">'.$LinkLocal.'</span>
                     <span class="mdi mdi-link-variant-plus" onclick="CopiarLinkLocal(`'.$idLinkLocal.'`)"> Copiar Link</span>
@@ -120,11 +122,12 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
         break;//fin caso 3
         
         case 4://lista los productos
-            $Limit=20;
+            $Limit=21;
             $idLocal=$obCon->normalizar($_REQUEST["idLocal"]);
             $BusquedaProducto=$obCon->normalizar($_REQUEST["BusquedaProducto"]);
             $cmbClasificacion=$obCon->normalizar($_REQUEST["cmbClasificacion"]);
             $Page=$obCon->normalizar($_REQUEST["Page"]);
+          
             if($idLocal==''){
                 exit("No se recibió un local");
             }
@@ -152,9 +155,12 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
             $Consulta2=$obCon->QueryExterno($sql, HOST, USER, PW, $dbLocal, "");
             $totales = $obCon->FetchAssoc($Consulta2);
             $ResultadosTotales = $totales['Items'];
-            
-            if($ResultadosTotales>$Limit){
-                $TotalPaginas= ceil($ResultadosTotales/$Limit);
+            $TotalPaginas= ceil($ResultadosTotales/$Limit);
+            if($Page>$TotalPaginas and $TotalPaginas<>0){
+                return;
+            }
+            if($ResultadosTotales>$Limit and !isset($_REQUEST["Scroll"])){
+                
                 if($Page>1){
                     $js="onclick=pageMinus();";
                     $css->botonNavegacion($js, "green", "pageNav-pageBack-icon mdi mdi-arrow-left-bold", "PageMinus");
@@ -190,7 +196,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                     $css->Cdiv();
                 $css->Cdiv();
             $css->Cdiv();
-           
+           print('<div id="divLoading" style="display:block;width:100px;height:100px;position:absolute;bottom:100px;left:50%;">Cargando</div>');
         break;//fin caso 4   
         
         case 5:// Lista de pedidos en el carrito de compras
@@ -346,8 +352,12 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
         break;//Fin caso 5    
         
         case 6://dibuja el listado de los locales de acuerdo a la busqueda
+            $Dominio=$obCon->normalizar($Domain);
+            $DatosDominio=$obCon->DevuelveValores("dominios", "Dominio", $Dominio);
+            $idCiudad=$DatosDominio["idCiudad"];
+            
             $Busqueda=$obCon->normalizar($_REQUEST["Busqueda"]);
-            $sql="SELECT * FROM locales WHERE Nombre LIKE '%$Busqueda%' AND Estado=1 ORDER BY Orden ASC LIMIT 50";
+            $sql="SELECT * FROM locales WHERE Nombre LIKE '%$Busqueda%' AND Estado=1 AND idCiudad='$idCiudad' ORDER BY Orden ASC LIMIT 50";
             $Consulta=$obCon->Query($sql);
             $Configuracion=$obCon->DevuelveValores("configuracion_general", "ID", 2004); //Se aloja la ruta del enlace
             while($DatosCategorias=$obCon->FetchAssoc($Consulta)){
@@ -363,7 +373,7 @@ if(!empty($_REQUEST["Accion"]) ){// se verifica si el indice accion es diferente
                 
                 }
                 
-                $LinkLocal=$Configuracion["Valor"].$idItem;
+                $LinkLocal=$Dominio.$Configuracion["Valor"].$idItem;
                 $idLinkLocal="linkLocal_".$idItem;
                 $link='<span id="'.$idLinkLocal.'" type="hidden" style="display:none;">'.$LinkLocal.'</span>
                         <span class="mdi mdi-link-variant-plus" onclick="CopiarLinkLocal(`'.$idLinkLocal.'`)"> Copiar Link</span>

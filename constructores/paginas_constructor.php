@@ -73,7 +73,7 @@ class PageConstruct extends html_estruct_class{
                 </div>
                 <div class="mdc-drawer__content">
                   <div class="user-info">
-                    <p class="name">Domi Buga</p>
+                    <p class="name">'.$Title.'</p>
                     <p class="email">info@domibuga.com</p>
                             <p class="email">317 7740609</p>
                   </div>
